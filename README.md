@@ -105,7 +105,7 @@ Traditional API development can take weeks or months to set up properly. BaseAPI
 This repository may be helpful for those seeking a backend implementation in Python that is both framework-agnostic
 and storage-agnostic (unlike Django).
 Such flexibility can be achieved by using a web framework that doesn't impose strict software design (like FastAPI) and
-applying a layered architecture patterned after the one proposed by Robert Martin, which we'll explore further.
+applying a layered architecture patterned after the one proposed by Matias Baglieri, which we'll explore further.
 
 
 <p align="center">
