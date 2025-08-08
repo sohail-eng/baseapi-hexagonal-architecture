@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from app.application.common.ports.user_command_gateway import UserCommandGateway
 from app.application.common.services.current_user import CurrentUserService
 from app.domain.entities.user import User
-from app.domain.exceptions.user import UserNotFoundByUsernameError
+from app.domain.exceptions.user import UserNotFoundByEmailError
 from app.domain.services.user import UserService
 from app.domain.value_objects.raw_password.raw_password import RawPassword
-from app.domain.value_objects.username.username import Username
+from app.domain.value_objects.email import Email
 from app.infrastructure.auth.exceptions import (
     AlreadyAuthenticatedError,
     AuthenticationError,
@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LogInRequest:
-    username: str
+    email: str
     password: str
 
 
@@ -60,9 +60,9 @@ class LogInHandler:
         :raises AuthorizationError:
         :raises DataMapperError:
         :raises DomainFieldError:
-        :raises UserNotFoundByUsernameError:
+        :raises UserNotFoundByEmailError:
         """
-        log.info("Log in: started. Username: '%s'.", request_data.username)
+        log.info("Log in: started. Email: '%s'.", request_data.email)
 
         try:
             await self._current_user_service.get_current_user()
@@ -70,24 +70,24 @@ class LogInHandler:
         except AuthenticationError:
             pass
 
-        username = Username(request_data.username)
+        email = Email(request_data.email)
         password = RawPassword(request_data.password)
 
-        user: User | None = await self._user_command_gateway.read_by_username(username)
+        user: User | None = await self._user_command_gateway.read_by_email(email)
         if user is None:
-            raise UserNotFoundByUsernameError(username)
+            raise UserNotFoundByEmailError(email)
 
         if not self._user_service.is_password_valid(user, password):
             raise AuthenticationError(AUTH_INVALID_PASSWORD)
 
-        if not user.is_active:
+        if not user.is_active.value:
             raise AuthenticationError(AUTH_ACCOUNT_INACTIVE)
 
-        await self._auth_session_service.create_session(user.id_)
+        await self._auth_session_service.create_session(user.id)
 
         log.info(
-            "Log in: done. User, ID: '%s', username '%s', role '%s'.",
-            user.id_.value,
-            user.username.value,
+            "Log in: done. User, ID: '%s', email '%s', role '%s'.",
+            user.id.value,
+            user.email.value,
             user.role.value,
         )

@@ -1,16 +1,18 @@
 import logging
 from dataclasses import dataclass
 from typing import TypedDict
-from uuid import UUID
 
 from app.application.common.ports.flusher import Flusher
 from app.application.common.ports.transaction_manager import TransactionManager
 from app.application.common.ports.user_command_gateway import UserCommandGateway
 from app.application.common.services.current_user import CurrentUserService
-from app.domain.exceptions.user import UsernameAlreadyExistsError
+from app.domain.exceptions.user import EmailAlreadyExistsError
 from app.domain.services.user import UserService
 from app.domain.value_objects.raw_password.raw_password import RawPassword
-from app.domain.value_objects.username.username import Username
+from app.domain.value_objects.email import Email
+from app.domain.value_objects.first_name import FirstName
+from app.domain.value_objects.last_name import LastName
+from app.domain.value_objects.language import Language
 from app.infrastructure.auth.exceptions import (
     AlreadyAuthenticatedError,
     AuthenticationError,
@@ -24,12 +26,14 @@ log = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SignUpRequest:
-    username: str
+    email: str
+    first_name: str
+    last_name: str
     password: str
 
 
 class SignUpResponse(TypedDict):
-    id: UUID
+    id: int
 
 
 class SignUpHandler:
@@ -61,9 +65,9 @@ class SignUpHandler:
         :raises DataMapperError:
         :raises DomainFieldError:
         :raises RoleAssignmentNotPermittedError:
-        :raises UsernameAlreadyExistsError:
+        :raises EmailAlreadyExistsError:
         """
-        log.info("Sign up: started. Username: '%s'.", request_data.username)
+        log.info("Sign up: started. Email: '%s'.", request_data.email)
 
         try:
             await self._current_user_service.get_current_user()
@@ -71,19 +75,28 @@ class SignUpHandler:
         except AuthenticationError:
             pass
 
-        username = Username(request_data.username)
+        email = Email(request_data.email)
+        first_name = FirstName(request_data.first_name)
+        last_name = LastName(request_data.last_name)
         password = RawPassword(request_data.password)
+        language = Language("en")
 
-        user = self._user_service.create_user(username, password)
+        user = self._user_service.create_user(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            password=password,
+            language=language,
+        )
 
         self._user_command_gateway.add(user)
 
         try:
             await self._flusher.flush()
-        except UsernameAlreadyExistsError:
+        except EmailAlreadyExistsError:
             raise
 
         await self._transaction_manager.commit()
 
-        log.info("Sign up: done. Username: '%s'.", user.username.value)
-        return SignUpResponse(id=user.id_.value)
+        log.info("Sign up: done. Email: '%s'.", user.email.value)
+        return SignUpResponse(id=user.id.value)
