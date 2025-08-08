@@ -774,7 +774,7 @@ BaseAPI is more than just a boilerplate—it's a complete development ecosystem 
 | 🔐 **JWT Authentication** | Secure user sessions with industry-standard tokens | Uses python-jose library to generate and verify JWT tokens with configurable expiration |
 | 💳 **Stripe Integration** | Complete payment and subscription processing | Built-in Stripe SDK integration with webhook handling for payments, subscriptions, and billing events |
 | ⚙️ **Background Tasks** | Handle long-running processes without blocking requests | Celery + Redis implementation for email sending, data processing, and scheduled jobs |
-| 🗃️ **Database Management** | Full MySQL integration with migrations | SQLAlchemy ORM with Alembic migrations for schema versioning and database evolution |
+| 🗃️ **Database Management** | Full Postgress integration with migrations | SQLAlchemy ORM with Alembic migrations for schema versioning and database evolution |
 | 📧 **Email System** | Automated email delivery with templates | Mailgun integration with development mode for testing and production-ready templates |
 | 🏗️ **Modular Architecture** | Clean, maintainable code structure | Follows FastAPI best practices with separated controllers, services, and models |
 
