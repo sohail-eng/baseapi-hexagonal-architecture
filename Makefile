@@ -1,5 +1,5 @@
 # Environment
-PYTHON := python
+PYTHON := python3.12
 CONFIGS_DIG := config
 TOML_CONFIG_MANAGER := $(CONFIGS_DIG)/toml_config_manager.py
 APP_ENV := local
