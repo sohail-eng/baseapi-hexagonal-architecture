@@ -55,7 +55,10 @@ async def init_database() -> None:
         from app.domain.entities.email_verification import EmailVerification
         from app.domain.entities.notification import Notification
         from app.domain.entities.password_reset import PasswordReset
+        from app.domain.entities.payment import Payment
         from app.domain.entities.session import Session
+        from app.domain.entities.subscription import Subscription
+        from app.domain.entities.subscription_user import SubscriptionUser
         
         print("🏗️ Creating database tables...")
         # Create all tables
