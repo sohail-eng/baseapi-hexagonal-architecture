@@ -1,5 +1,5 @@
 services:
-  web_app_db_pg:
+  baseapi_db:
     container_name: "app_db_pg_${APP_ENV}"
     image: postgres:16-alpine
     shm_size: 128mb
@@ -27,11 +27,11 @@ services:
       APP_ENV: ${APP_ENV}
       UVICORN_HOST: ${UVICORN_HOST}
       UVICORN_PORT: ${UVICORN_PORT}
-      POSTGRES_HOST: web_app_db_pg
+      POSTGRES_HOST: baseapi_db
     ports:
       - "${UVICORN_PORT}:${UVICORN_PORT}"
     depends_on:
-      web_app_db_pg:
+      baseapi_db:
         condition: service_healthy
     command: >
       sh -c "

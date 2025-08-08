@@ -1,6 +1,6 @@
 # PostgreSQL
 [postgres]
-DB = "web_app_db_pg"
+DB = "baseapi_db"
 HOST = "localhost"
 PORT = 5432
 DRIVER = "psycopg"

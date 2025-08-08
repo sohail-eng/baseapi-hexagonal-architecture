@@ -25,16 +25,25 @@ start:
 	. env/bin/activate && python3.12 src/app/run.py
 
 alembic:
-	. env/bin/activate && alembic init alembic
+	. env/bin/activate && alembic init src/app/infrastructure/persistence_sqla/alembic
 
 alembic-revision:
-	. env/bin/activate && alembic revision --autogenerate -m "Add new table"
+	. env/bin/activate && alembic -c src/app/infrastructure/persistence_sqla/alembic.ini revision --autogenerate -m "Add new table"
 
 alembic-upgrade:
-	. env/bin/activate && alembic upgrade head
+	. env/bin/activate && alembic -c src/app/infrastructure/persistence_sqla/alembic.ini upgrade head
 
 alembic-downgrade:
-	. env/bin/activate && alembic downgrade -1
+	. env/bin/activate && alembic -c src/app/infrastructure/persistence_sqla/alembic.ini downgrade -1
+
+create-db:
+	. env/bin/activate && APP_ENV=$(APP_ENV) python3.12 scripts/create_db.py
+
+init-db: create-db
+	. env/bin/activate && APP_ENV=$(APP_ENV) python3.12 scripts/init_db.py
+
+test-config:
+	. env/bin/activate && APP_ENV=$(APP_ENV) python3.12 scripts/test_config.py
 # Docker compose
 DOCKER_COMPOSE := docker compose
 DOCKER_COMPOSE_PRUNE := scripts/makefile/docker_prune.sh
