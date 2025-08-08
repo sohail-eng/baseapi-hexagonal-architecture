@@ -3,7 +3,7 @@ from typing import Protocol
 
 from app.domain.entities.user import User
 from app.domain.value_objects.user_id import UserId
-from app.domain.value_objects.username.username import Username
+from app.domain.value_objects.email import Email
 
 
 class UserCommandGateway(Protocol):
@@ -20,9 +20,9 @@ class UserCommandGateway(Protocol):
         """
 
     @abstractmethod
-    async def read_by_username(
+    async def read_by_email(
         self,
-        username: Username,
+        email: Email,
         for_update: bool = False,
     ) -> User | None:
         """

@@ -13,23 +13,23 @@ from app.application.common.services.authorization.permissions import (
 from app.application.common.services.current_user import CurrentUserService
 from app.domain.entities.user import User
 from app.domain.enums.user_role import UserRole
-from app.domain.exceptions.user import UserNotFoundByUsernameError
+from app.domain.exceptions.user import UserNotFoundByEmailError
 from app.domain.services.user import UserService
-from app.domain.value_objects.username.username import Username
+from app.domain.value_objects.email import Email
 
 log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
 class RevokeAdminRequest:
-    username: str
+    email: str
 
 
 class RevokeAdminInteractor:
     """
-    - Open to super admins.
+    - Open to admins.
     - Revokes admin rights from a specified user.
-    - Super admin rights can not be changed
+    - Admin rights can be managed by other admins.
     """
 
     def __init__(
@@ -50,12 +50,12 @@ class RevokeAdminInteractor:
         :raises DataMapperError:
         :raises AuthorizationError:
         :raises DomainFieldError:
-        :raises UserNotFoundByUsernameError:
+        :raises UserNotFoundByEmailError:
         :raises RoleChangeNotPermittedError:
         """
         log.info(
-            "Revoke admin: started. Username: '%s'.",
-            request_data.username,
+            "Revoke admin: started. Email: '%s'.",
+            request_data.email,
         )
 
         current_user = await self._current_user_service.get_current_user()
@@ -68,18 +68,18 @@ class RevokeAdminInteractor:
             ),
         )
 
-        username = Username(request_data.username)
-        user: User | None = await self._user_command_gateway.read_by_username(
-            username,
+        email = Email(request_data.email)
+        user: User | None = await self._user_command_gateway.read_by_email(
+            email,
             for_update=True,
         )
         if user is None:
-            raise UserNotFoundByUsernameError(username)
+            raise UserNotFoundByEmailError(email)
 
         self._user_service.toggle_user_admin_role(user, is_admin=False)
         await self._transaction_manager.commit()
 
         log.info(
-            "Revoke admin: done. Username: '%s'.",
-            user.username.value,
+            "Revoke admin: done. Email: '%s'.",
+            user.email.value,
         )

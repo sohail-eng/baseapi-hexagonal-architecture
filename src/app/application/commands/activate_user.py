@@ -17,23 +17,23 @@ from app.application.common.services.authorization.permissions import (
 from app.application.common.services.current_user import CurrentUserService
 from app.domain.entities.user import User
 from app.domain.enums.user_role import UserRole
-from app.domain.exceptions.user import UserNotFoundByUsernameError
+from app.domain.exceptions.user import UserNotFoundByEmailError
 from app.domain.services.user import UserService
-from app.domain.value_objects.username.username import Username
+from app.domain.value_objects.email import Email
 
 log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
 class ActivateUserRequest:
-    username: str
+    email: str
 
 
 class ActivateUserInteractor:
     """
     - Open to admins.
     - Restores a previously soft-deleted user.
-    - Only super admins can activate other admins.
+    - Only admins can activate other admins.
     """
 
     def __init__(
@@ -54,12 +54,12 @@ class ActivateUserInteractor:
         :raises DataMapperError:
         :raises AuthorizationError:
         :raises DomainFieldError:
-        :raises UserNotFoundByUsernameError:
+        :raises UserNotFoundByEmailError:
         :raises ActivationChangeNotPermittedError:
         """
         log.info(
-            "Activate user: started. Username: '%s'.",
-            request_data.username,
+            "Activate user: started. Email: '%s'.",
+            request_data.email,
         )
 
         current_user = await self._current_user_service.get_current_user()
@@ -72,13 +72,13 @@ class ActivateUserInteractor:
             ),
         )
 
-        username = Username(request_data.username)
-        user: User | None = await self._user_command_gateway.read_by_username(
-            username,
+        email = Email(request_data.email)
+        user: User | None = await self._user_command_gateway.read_by_email(
+            email,
             for_update=True,
         )
         if user is None:
-            raise UserNotFoundByUsernameError(username)
+            raise UserNotFoundByEmailError(email)
 
         authorize(
             CanManageSubordinate(),
@@ -92,6 +92,6 @@ class ActivateUserInteractor:
         await self._transaction_manager.commit()
 
         log.info(
-            "Activate user: done. Username: '%s'.",
-            user.username.value,
+            "Activate user: done. Email: '%s'.",
+            user.email.value,
         )

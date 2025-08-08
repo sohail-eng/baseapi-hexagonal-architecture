@@ -13,5 +13,5 @@ class Flusher(Protocol):
         Flush pending changes to validate constraints or trigger side effects.
 
         :raises DataMapperError:
-        :raises UsernameAlreadyExists:
+        :raises EmailAlreadyExists:
         """
