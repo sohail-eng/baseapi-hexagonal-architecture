@@ -6,10 +6,10 @@ from app.application.common.services.authorization.base import (
 from app.application.common.services.constants import AUTHZ_NOT_AUTHORIZED
 
 
-def authorize[PC: PermissionContext](
-    permission: Permission[PC],
+def authorize(
+    permission: Permission,
     *,
-    context: PC,
+    context: PermissionContext,
 ) -> None:
     """
     :raises AuthorizationError:

@@ -7,6 +7,6 @@ class PermissionContext:
     pass
 
 
-class Permission[PC: PermissionContext](ABC):
+class Permission(ABC):
     @abstractmethod
-    def is_satisfied_by(self, context: PC) -> bool: ...
+    def is_satisfied_by(self, context: PermissionContext) -> bool: ...
