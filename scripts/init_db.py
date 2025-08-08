@@ -48,6 +48,11 @@ async def init_database() -> None:
         # Ensure all table mappings are registered
         map_tables()
         
+        # Import entities to ensure they are registered
+        from app.domain.entities.user import User
+        from app.domain.entities.country import Country
+        from app.domain.entities.city import City
+        
         print("🏗️ Creating database tables...")
         # Create all tables
         async with engine.begin() as conn:

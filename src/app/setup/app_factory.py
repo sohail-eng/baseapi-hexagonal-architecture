@@ -26,6 +26,11 @@ async def init_database(engine: AsyncEngine) -> None:
         # Ensure all table mappings are registered
         map_tables()
         
+        # Import entities to ensure they are registered
+        from app.domain.entities.user import User
+        from app.domain.entities.country import Country
+        from app.domain.entities.city import City
+        
         # Create all tables
         async with engine.begin() as conn:
             await conn.run_sync(mapping_registry.metadata.create_all)
