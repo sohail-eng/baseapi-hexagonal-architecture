@@ -1,10 +1,66 @@
 # Overview
 
-📘 This FastAPI-based project and its documentation represent a practical interpretation of Clean Architecture and
-Command Query Responsibility Segregation (CQRS) principles with elements of Domain-Driven Design (DDD).
-Although it's not meant to serve as a comprehensive reference or a strict application of these methodologies, the
-project demonstrates how their core ideas can be effectively put into practice in Python.
-If they're new to you, refer to the [Useful Resources](#useful-resources) section.
+
+
+### 🚀 How BaseAPI Works
+
+#### 1. Request Processing Flow
+When a request hits your API, BaseAPI processes it through several layers:
+
+- **Authentication Layer**: JWT tokens validate user identity
+- **Controller Layer**: Route handlers process the request
+- **Service Layer**: Business logic executes the operation
+- **Database Layer**: SQLAlchemy manages data persistence
+
+#### 2. Background Task Processing
+Long-running operations are handled asynchronously:
+
+- Tasks are queued in Redis for processing
+- Celery workers pick up and execute tasks
+- Results are stored and can be retrieved later
+- Email notifications and data processing happen without blocking API responses
+
+#### 3. Payment Processing Workflow
+Stripe integration handles the complete payment lifecycle:
+
+- Customer creation and management
+- Subscription setup with multiple pricing tiers
+- Webhook handling for payment events
+- Automatic retry logic for failed payments
+
+## Business Model Support
+
+### Subscription Management
+- Multiple subscription tiers with different features
+- Automatic billing and renewal handling
+- Proration support for plan changes
+- Grace period handling for failed payments
+
+### Payment Methods
+- Credit card processing through Stripe
+- Bank transfer support
+- Multiple currency handling
+- Automatic invoice generation
+
+## Production Readiness
+
+BaseAPI is designed for production deployment with enterprise-grade features:
+
+- **Docker Support**: Container-ready for Kubernetes deployment
+- **Environment Configuration**: Separate configs for development, staging, and production
+- **Database Migrations**: Version-controlled schema changes with Alembic
+- **Error Handling**: Comprehensive error handling and logging
+- **Security**: JWT authentication, CORS configuration, and input validation
+
+## Why Choose BaseAPI?
+
+Traditional API development can take weeks or months to set up properly. BaseAPI eliminates this overhead by providing:
+
+- **Instant Development**: Start building features immediately, not infrastructure
+- **Battle-Tested Components**: All integrations are production-ready and thoroughly tested
+- **Scalable Architecture**: Modular design supports teams and complex applications
+- **Complete Feature Set**: Authentication, payments, background jobs, and email—all included
+- **Developer Experience**: Automatic API documentation, type hints, and modern Python practices
 
 # Table of contents
 
@@ -32,9 +88,15 @@ If they're new to you, refer to the [Useful Resources](#useful-resources) sectio
         3. [Local Environment](#local-environment)
         4. [Other Environments](#other-environments-devprod)
         5. [Adding New Environments](#adding-new-environments)
-4. [Useful Resources](#useful-resources)
-5. [Support the Project](#-support-the-project)
-6. [Acknowledgements](#acknowledgements)
+4. [BaseAPI Integration](#baseapi-integration)
+    1. [What is BaseAPI?](#what-is-baseapi)
+    2. [Core Features](#core-features)
+    3. [Business Model Support](#business-model-support)
+    4. [Production Readiness](#production-readiness)
+    5. [Why Choose BaseAPI?](#why-choose-baseapi)
+5. [Useful Resources](#useful-resources)
+6. [Support the Project](#-support-the-project)
+7. [Acknowledgements](#acknowledgements)
 
 # Architecture Principles
 
@@ -684,3 +746,43 @@ contextual, per-route error handling with automatic OpenAPI schema generation.
 
 [^1]: Session and token share the same expiry time, avoiding database reads if the token is expired.
 This scheme of using JWT **is not** related to OAuth 2.0 and is a custom micro-optimization.
+
+---
+
+# BaseAPI Integration
+
+## What is BaseAPI?
+
+BaseAPI is a comprehensive backend framework that eliminates the complexity of building scalable, secure web applications from scratch. Built on FastAPI's high-performance foundation, it provides everything you need to launch production-grade APIs in minutes, not months.
+
+### 🎯 Overview
+
+BaseAPI is more than just a boilerplate—it's a complete development ecosystem that combines the speed of FastAPI with enterprise-grade features. Think of it as your technical co-founder in a box, providing authentication, payment processing, background tasks, and database management out of the box.
+
+### ✅ Perfect For:
+- SaaS Applications requiring subscription management and payment processing
+- Startups needing a robust, scalable backend without extensive development time
+- Development Teams building APIs for web and mobile applications
+- MVPs that need to move fast while maintaining production quality
+
+## Core Features
+
+<div align="center">
+
+| Feature | What It Does | How It Works |
+|:--------|:------------|:------------|
+| 🔐 **JWT Authentication** | Secure user sessions with industry-standard tokens | Uses python-jose library to generate and verify JWT tokens with configurable expiration |
+| 💳 **Stripe Integration** | Complete payment and subscription processing | Built-in Stripe SDK integration with webhook handling for payments, subscriptions, and billing events |
+| ⚙️ **Background Tasks** | Handle long-running processes without blocking requests | Celery + Redis implementation for email sending, data processing, and scheduled jobs |
+| 🗃️ **Database Management** | Full MySQL integration with migrations | SQLAlchemy ORM with Alembic migrations for schema versioning and database evolution |
+| 📧 **Email System** | Automated email delivery with templates | Mailgun integration with development mode for testing and production-ready templates |
+| 🏗️ **Modular Architecture** | Clean, maintainable code structure | Follows FastAPI best practices with separated controllers, services, and models |
+
+</div>
+
+
+<div align="center">
+BaseAPI transforms months of backend development into minutes of configuration. Whether you're building your first startup or your hundredth API, BaseAPI provides the solid foundation you need to focus on what matters most—your unique business logic.
+
+Made with ❤️ by Matias Baglieri
+</div>
