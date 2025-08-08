@@ -29,6 +29,7 @@ from app.infrastructure.persistence_sqla.mappings.country import map_countries_t
 from app.infrastructure.persistence_sqla.mappings.email_verification import map_email_verifications_table
 from app.infrastructure.persistence_sqla.mappings.notification import map_notifications_table
 from app.infrastructure.persistence_sqla.mappings.password_reset import map_password_resets_table
+from app.infrastructure.persistence_sqla.mappings.session import map_sessions_table
 from app.infrastructure.persistence_sqla.mappings.user import map_users_table
 
 
@@ -40,3 +41,4 @@ def map_tables() -> None:
     map_email_verifications_table()
     map_notifications_table()
     map_password_resets_table()
+    map_sessions_table()
