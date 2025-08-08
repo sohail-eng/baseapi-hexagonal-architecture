@@ -52,6 +52,7 @@ async def init_database() -> None:
         from app.domain.entities.user import User
         from app.domain.entities.country import Country
         from app.domain.entities.city import City
+        from app.domain.entities.email_verification import EmailVerification
         
         print("🏗️ Creating database tables...")
         # Create all tables

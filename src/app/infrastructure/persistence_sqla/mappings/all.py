@@ -26,6 +26,7 @@ from app.infrastructure.persistence_sqla.mappings.auth_session import (
 )
 from app.infrastructure.persistence_sqla.mappings.city import map_cities_table
 from app.infrastructure.persistence_sqla.mappings.country import map_countries_table
+from app.infrastructure.persistence_sqla.mappings.email_verification import map_email_verifications_table
 from app.infrastructure.persistence_sqla.mappings.user import map_users_table
 
 
@@ -34,3 +35,4 @@ def map_tables() -> None:
     map_auth_sessions_table()
     map_countries_table()
     map_cities_table()
+    map_email_verifications_table()

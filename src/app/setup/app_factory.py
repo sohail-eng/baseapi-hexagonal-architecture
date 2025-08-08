@@ -30,6 +30,7 @@ async def init_database(engine: AsyncEngine) -> None:
         from app.domain.entities.user import User
         from app.domain.entities.country import Country
         from app.domain.entities.city import City
+        from app.domain.entities.email_verification import EmailVerification
         
         # Create all tables
         async with engine.begin() as conn:
