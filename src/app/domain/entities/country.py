@@ -11,8 +11,6 @@ from app.domain.value_objects.country_id import CountryId
 from app.domain.value_objects.country_name import CountryName
 from app.domain.value_objects.iso_code import IsoCode
 from app.domain.value_objects.coordinates import Coordinates
-from app.domain.value_objects.currency_info import CurrencyInfo
-from app.domain.value_objects.location_info import LocationInfo
 
 
 @dataclass(eq=False, kw_only=True)

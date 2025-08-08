@@ -1,12 +1,15 @@
 from abc import ABC
 from dataclasses import asdict, dataclass, fields
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 from app.domain.exceptions.base import DomainFieldError
 
 
+V = TypeVar("V")
+
+
 @dataclass(frozen=True, repr=False)
-class ValueObject(ABC):
+class ValueObject(Generic[V], ABC):
     """
     Base class for immutable value objects (VO) in the domain.
     - Defined by its attributes, which must also be immutable.

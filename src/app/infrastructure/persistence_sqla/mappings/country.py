@@ -1,15 +1,10 @@
 """
-SQLAlchemy mapping for Country entity.
+SQLAlchemy mapping for Country table metadata.
 """
 
-from sqlalchemy import Column, Integer, String, Float, JSON, CheckConstraint
+from sqlalchemy import Integer, String, Float, JSON, CheckConstraint
 from sqlalchemy.orm import mapped_column
 
-from app.domain.entities.country import Country
-from app.domain.value_objects.country_id import CountryId
-from app.domain.value_objects.country_name import CountryName
-from app.domain.value_objects.iso_code import IsoCode
-from app.domain.value_objects.coordinates import Coordinates
 from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 
@@ -51,31 +46,4 @@ def map_countries_table() -> None:
             CheckConstraint('longitude >= -180 AND longitude <= 180', name='check_longitude_range'),
         )
     
-    # Register the mapping
-    mapping_registry.map_imperatively(
-        Country,
-        CountriesTable,
-        properties={
-            "id": mapping_registry.column_property(
-                CountriesTable.id,
-                CountryId
-            ),
-            "name": mapping_registry.column_property(
-                CountriesTable.name,
-                CountryName
-            ),
-            "iso3": mapping_registry.column_property(
-                CountriesTable.iso3,
-                IsoCode
-            ),
-            "iso2": mapping_registry.column_property(
-                CountriesTable.iso2,
-                IsoCode
-            ),
-            "coordinates": mapping_registry.column_property(
-                CountriesTable.latitude,
-                CountriesTable.longitude,
-                Coordinates
-            ),
-        }
-    )
+    # Keep only table metadata for create_all

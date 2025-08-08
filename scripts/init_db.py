@@ -60,8 +60,12 @@ async def init_database() -> None:
         from app.domain.entities.subscription import Subscription
         from app.domain.entities.subscription_user import SubscriptionUser
         
+        print("🧹 Dropping existing tables (local env)...")
+        async with engine.begin() as conn:
+            # For local/dev environment, drop all known tables first
+            await conn.run_sync(mapping_registry.metadata.drop_all)
+
         print("🏗️ Creating database tables...")
-        # Create all tables
         async with engine.begin() as conn:
             await conn.run_sync(mapping_registry.metadata.create_all)
         

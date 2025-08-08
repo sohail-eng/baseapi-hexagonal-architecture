@@ -1,32 +1,12 @@
 """
-SQLAlchemy mapping for User entity.
+SQLAlchemy mapping for User table metadata.
 """
 
-from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Enum, ForeignKey
+from sqlalchemy import Integer, String, DateTime, Boolean, Text, Enum, ForeignKey
 from sqlalchemy.orm import mapped_column
 import sqlalchemy as sa
 
-from app.domain.entities.user import User
 from app.domain.enums.user_role import UserRole
-from app.domain.value_objects.user_id import UserId
-from app.domain.value_objects.email import Email
-from app.domain.value_objects.first_name import FirstName
-from app.domain.value_objects.last_name import LastName
-from app.domain.value_objects.user_password_hash import UserPasswordHash
-from app.domain.value_objects.user_status import UserActive, UserBlocked, UserVerified
-from app.domain.value_objects.retry_count import RetryCount
-from app.domain.value_objects.last_login import LastLogin
-from app.domain.value_objects.profile_picture import ProfilePicture
-from app.domain.value_objects.phone_number import PhoneNumber
-from app.domain.value_objects.language import Language
-from app.domain.value_objects.address import Address
-from app.domain.value_objects.postal_code import PostalCode
-from app.domain.value_objects.country_id import CountryId
-from app.domain.value_objects.city_id import CityId
-from app.domain.value_objects.subscription import Subscription
-from app.domain.value_objects.created_at import CreatedAt
-from app.domain.value_objects.updated_at import UpdatedAt
 from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 
@@ -70,91 +50,6 @@ def map_users_table() -> None:
         # Subscription
         subscription = mapped_column(String(50), nullable=True)
     
-    # Register the mapping
-    mapping_registry.map_imperatively(
-        User,
-        UsersTable,
-        properties={
-            "id": mapping_registry.column_property(
-                UsersTable.id,
-                UserId
-            ),
-            "email": mapping_registry.column_property(
-                UsersTable.email,
-                Email
-            ),
-            "first_name": mapping_registry.column_property(
-                UsersTable.first_name,
-                FirstName
-            ),
-            "last_name": mapping_registry.column_property(
-                UsersTable.last_name,
-                LastName
-            ),
-            "role": UsersTable.role,
-            "is_active": mapping_registry.column_property(
-                UsersTable.is_active,
-                UserActive
-            ),
-            "is_blocked": mapping_registry.column_property(
-                UsersTable.is_blocked,
-                UserBlocked
-            ),
-            "is_verified": mapping_registry.column_property(
-                UsersTable.is_verified,
-                UserVerified
-            ),
-            "retry_count": mapping_registry.column_property(
-                UsersTable.retry_count,
-                RetryCount
-            ),
-            "password": mapping_registry.column_property(
-                UsersTable.password,
-                UserPasswordHash
-            ),
-            "created_at": mapping_registry.column_property(
-                UsersTable.created_at,
-                CreatedAt
-            ),
-            "updated_at": mapping_registry.column_property(
-                UsersTable.updated_at,
-                UpdatedAt
-            ),
-            "last_login": mapping_registry.column_property(
-                UsersTable.last_login,
-                LastLogin
-            ),
-            "profile_picture": mapping_registry.column_property(
-                UsersTable.profile_picture,
-                ProfilePicture
-            ),
-            "phone_number": mapping_registry.column_property(
-                UsersTable.phone_number,
-                PhoneNumber
-            ),
-            "language": mapping_registry.column_property(
-                UsersTable.language,
-                Language
-            ),
-            "address": mapping_registry.column_property(
-                UsersTable.address,
-                Address
-            ),
-            "postal_code": mapping_registry.column_property(
-                UsersTable.postal_code,
-                PostalCode
-            ),
-            "country_id": mapping_registry.column_property(
-                UsersTable.country_id,
-                CountryId
-            ),
-            "city_id": mapping_registry.column_property(
-                UsersTable.city_id,
-                CityId
-            ),
-            "subscription": mapping_registry.column_property(
-                UsersTable.subscription,
-                Subscription
-            ),
-        }
-    )
+    # Note: We intentionally do not map the domain `User` entity here.
+    # The purpose of this module during init_db is to define table metadata
+    # via the mapped `UsersTable` so that `create_all` can create tables.
