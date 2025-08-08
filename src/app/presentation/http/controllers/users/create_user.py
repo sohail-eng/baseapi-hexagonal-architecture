@@ -16,7 +16,7 @@ from app.domain.enums.user_role import UserRole
 from app.domain.exceptions.base import DomainFieldError
 from app.domain.exceptions.user import (
     RoleAssignmentNotPermittedError,
-    UsernameAlreadyExistsError,
+    EmailAlreadyExistsError,
 )
 from app.infrastructure.auth.exceptions import AuthenticationError
 from app.infrastructure.exceptions.gateway import DataMapperError
@@ -35,7 +35,9 @@ class CreateUserRequestPydantic(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    username: str
+    email: str
+    first_name: str
+    last_name: str
     password: str
     role: UserRole = Field(default=UserRole.USER)
 
@@ -56,7 +58,7 @@ def create_create_user_router() -> APIRouter:
             AuthorizationError: status.HTTP_403_FORBIDDEN,
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
             RoleAssignmentNotPermittedError: status.HTTP_422_UNPROCESSABLE_ENTITY,
-            UsernameAlreadyExistsError: status.HTTP_409_CONFLICT,
+            EmailAlreadyExistsError: status.HTTP_409_CONFLICT,
         },
         default_on_error=log_info,
         status_code=status.HTTP_201_CREATED,
@@ -68,7 +70,9 @@ def create_create_user_router() -> APIRouter:
         interactor: FromDishka[CreateUserInteractor],
     ) -> CreateUserResponse:
         request_data = CreateUserRequest(
-            username=request_data_pydantic.username,
+            email=request_data_pydantic.email,
+            first_name=request_data_pydantic.first_name,
+            last_name=request_data_pydantic.last_name,
             password=request_data_pydantic.password,
             role=request_data_pydantic.role,
         )

@@ -213,7 +213,7 @@ In other words, dependencies must never point outwards within the application's 
     layer.
 >
 > - In specific cases where database constraints enforce business rules, the Infrastructure layer may raise
-    domain-specific exceptions, such as `UsernameAlreadyExistsError` for a `UNIQUE CONSTRAINT` violation.
+    domain-specific exceptions, such as `emailAlreadyExistsError` for a `UNIQUE CONSTRAINT` violation.
     Handling these exceptions in the Application layer ensures that any business logic implemented in adapters remains
     under control.
 >
@@ -275,7 +275,7 @@ Let's agree, for this project, that Dependency Rule **does not apply to adapters
 > - **_Basic_** validation, like checking whether the structure of the incoming request matches the structure of the
     defined request model (e.g., type safety and required fields) should be performed by controllers at this layer,
     while **_business rule_** validation (e.g., ensuring the email domain is allowed, verifying the uniqueness of
-    username, or checking if a user meets the required age) belongs to the Domain or Application layer.
+    email, or checking if a user meets the required age) belongs to the Domain or Application layer.
 > - Business rule validation often involves relationships between fields, such as ensuring that a discount applies only
     within a specific date range or a promotion code is valid for orders above a certain total.
 > - **Carefully** consider using Pydantic for business rule validation. While convenient, Pydantic models are slower
@@ -568,24 +568,24 @@ natural.
 ### Users (`/api/v1/users`)
 
 - `/` (POST): Open to **admins**.
-    - Creates a new user, including admins, if the username is unique.
+    - Creates a new user, including admins, if the email is unique.
     - Only super admins can create new admins.
 - `/` (GET): Open to **admins**.
     - Retrieves a paginated list of existing users with relevant information.
-- `/{username}/password`: Open to **authenticated users**.
+- `/{email}/password`: Open to **authenticated users**.
     - Changes the user's password.
     - The current user can change their own password.
     - Admins can change passwords of subordinate users.
-- `/{username}/grant-admin`: Open to **super admins**.
+- `/{email}/grant-admin`: Open to **super admins**.
     - Grants admin rights to a specified user.
     - Super admin rights can not be changed.
-- `/{username}/revoke-admin`: Open to **super admins**.
+- `/{email}/revoke-admin`: Open to **super admins**.
     - Revokes admin rights from a specified user.
     - Super admin rights can not be changed.
-- `/{username}/activate`: Open to **admins**.
+- `/{email}/activate`: Open to **admins**.
     - Restores a previously soft-deleted user.
     - Only super admins can activate other admins.
-- `/{username}/deactivate`: Open to **admins**.
+- `/{email}/deactivate`: Open to **admins**.
     - Soft-deletes an existing user, making that user inactive.
     - Also deletes the user's sessions.
     - Only super admins can deactivate other admins.

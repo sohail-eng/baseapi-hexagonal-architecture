@@ -12,7 +12,7 @@ from app.application.commands.change_password import (
 )
 from app.application.common.exceptions.authorization import AuthorizationError
 from app.domain.exceptions.base import DomainFieldError
-from app.domain.exceptions.user import UserNotFoundByUsernameError
+from app.domain.exceptions.user import UserNotFoundByEmailError
 from app.infrastructure.auth.exceptions import AuthenticationError
 from app.infrastructure.exceptions.gateway import DataMapperError
 from app.presentation.http.auth.fastapi_openapi_markers import cookie_scheme
@@ -26,7 +26,7 @@ def create_change_password_router() -> APIRouter:
     router = ErrorAwareRouter()
 
     @router.patch(
-        "/{username}/password",
+        "/{email}/password",
         description=getdoc(ChangePasswordInteractor),
         error_map={
             AuthenticationError: status.HTTP_401_UNAUTHORIZED,
@@ -37,7 +37,7 @@ def create_change_password_router() -> APIRouter:
             ),
             AuthorizationError: status.HTTP_403_FORBIDDEN,
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
-            UserNotFoundByUsernameError: status.HTTP_404_NOT_FOUND,
+            UserNotFoundByEmailError: status.HTTP_404_NOT_FOUND,
         },
         default_on_error=log_info,
         status_code=status.HTTP_204_NO_CONTENT,
@@ -45,12 +45,12 @@ def create_change_password_router() -> APIRouter:
     )
     @inject
     async def change_password(
-        username: Annotated[str, Path()],
+        email: Annotated[str, Path()],
         password: Annotated[str, Body()],
         interactor: FromDishka[ChangePasswordInteractor],
     ) -> None:
         request_data = ChangePasswordRequest(
-            username=username,
+            email=email,
             password=password,
         )
         await interactor.execute(request_data)

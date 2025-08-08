@@ -9,7 +9,7 @@ from app.application.common.exceptions.authorization import AuthorizationError
 from app.domain.exceptions.base import DomainFieldError
 from app.domain.exceptions.user import (
     RoleAssignmentNotPermittedError,
-    UsernameAlreadyExistsError,
+    EmailAlreadyExistsError,
 )
 from app.infrastructure.auth.exceptions import AlreadyAuthenticatedError
 from app.infrastructure.auth.handlers.sign_up import (
@@ -43,7 +43,7 @@ def create_sign_up_router() -> APIRouter:
             ),
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
             RoleAssignmentNotPermittedError: status.HTTP_422_UNPROCESSABLE_ENTITY,
-            UsernameAlreadyExistsError: status.HTTP_409_CONFLICT,
+            EmailAlreadyExistsError: status.HTTP_409_CONFLICT,
         },
         default_on_error=log_info,
         status_code=status.HTTP_201_CREATED,

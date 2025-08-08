@@ -14,7 +14,7 @@ from app.application.common.exceptions.authorization import AuthorizationError
 from app.domain.exceptions.base import DomainFieldError
 from app.domain.exceptions.user import (
     RoleChangeNotPermittedError,
-    UserNotFoundByUsernameError,
+    UserNotFoundByEmailError,
 )
 from app.infrastructure.auth.exceptions import AuthenticationError
 from app.infrastructure.exceptions.gateway import DataMapperError
@@ -29,7 +29,7 @@ def create_revoke_admin_router() -> APIRouter:
     router = ErrorAwareRouter()
 
     @router.patch(
-        "/{username}/revoke-admin",
+        "/{email}/revoke-admin",
         description=getdoc(RevokeAdminInteractor),
         error_map={
             AuthenticationError: status.HTTP_401_UNAUTHORIZED,
@@ -40,7 +40,7 @@ def create_revoke_admin_router() -> APIRouter:
             ),
             AuthorizationError: status.HTTP_403_FORBIDDEN,
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
-            UserNotFoundByUsernameError: status.HTTP_404_NOT_FOUND,
+            UserNotFoundByEmailError: status.HTTP_404_NOT_FOUND,
             RoleChangeNotPermittedError: status.HTTP_403_FORBIDDEN,
         },
         default_on_error=log_info,
@@ -49,10 +49,10 @@ def create_revoke_admin_router() -> APIRouter:
     )
     @inject
     async def revoke_admin(
-        username: Annotated[str, Path()],
+        email: Annotated[str, Path()],
         interactor: FromDishka[RevokeAdminInteractor],
     ) -> None:
-        request_data = RevokeAdminRequest(username)
+        request_data = RevokeAdminRequest(email)
         await interactor.execute(request_data)
 
     return router

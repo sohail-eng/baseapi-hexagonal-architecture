@@ -14,7 +14,7 @@ from app.application.common.exceptions.authorization import AuthorizationError
 from app.domain.exceptions.base import DomainFieldError
 from app.domain.exceptions.user import (
     ActivationChangeNotPermittedError,
-    UserNotFoundByUsernameError,
+    UserNotFoundByEmailError,
 )
 from app.infrastructure.auth.exceptions import AuthenticationError
 from app.infrastructure.exceptions.gateway import DataMapperError
@@ -29,7 +29,7 @@ def create_activate_user_router() -> APIRouter:
     router = ErrorAwareRouter()
 
     @router.patch(
-        "/{username}/activate",
+        "/{email}/activate",
         description=getdoc(ActivateUserInteractor),
         error_map={
             AuthenticationError: status.HTTP_401_UNAUTHORIZED,
@@ -40,7 +40,7 @@ def create_activate_user_router() -> APIRouter:
             ),
             AuthorizationError: status.HTTP_403_FORBIDDEN,
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
-            UserNotFoundByUsernameError: status.HTTP_404_NOT_FOUND,
+            UserNotFoundByEmailError: status.HTTP_404_NOT_FOUND,
             ActivationChangeNotPermittedError: status.HTTP_403_FORBIDDEN,
         },
         default_on_error=log_info,
@@ -49,10 +49,10 @@ def create_activate_user_router() -> APIRouter:
     )
     @inject
     async def activate_user(
-        username: Annotated[str, Path()],
+        email: Annotated[str, Path()],
         interactor: FromDishka[ActivateUserInteractor],
     ) -> None:
-        request_data = ActivateUserRequest(username)
+        request_data = ActivateUserRequest(email)
         await interactor.execute(request_data)
 
     return router

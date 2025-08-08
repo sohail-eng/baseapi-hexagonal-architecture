@@ -34,7 +34,7 @@ class ListUsersRequestPydantic(BaseModel):
 
     limit: Annotated[int, Field(ge=1)] = 20
     offset: Annotated[int, Field(ge=0)] = 0
-    sorting_field: Annotated[str, Field()] = "username"
+    sorting_field: Annotated[str, Field()] = "email"
     sorting_order: Annotated[SortingOrder, Field()] = SortingOrder.ASC
 
 

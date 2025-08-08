@@ -36,9 +36,12 @@ def test_cannot_manage_another_user() -> None:
 @pytest.mark.parametrize(
     ("subject_role", "target_role"),
     [
-        (UserRole.SUPER_ADMIN, UserRole.ADMIN),
-        (UserRole.SUPER_ADMIN, UserRole.USER),
+        (UserRole.ADMIN, UserRole.MODERATOR),
         (UserRole.ADMIN, UserRole.USER),
+        (UserRole.ADMIN, UserRole.GUEST),
+        (UserRole.MODERATOR, UserRole.USER),
+        (UserRole.MODERATOR, UserRole.GUEST),
+        (UserRole.USER, UserRole.GUEST),
     ],
 )
 def test_can_manage_subordinate(
@@ -56,10 +59,16 @@ def test_can_manage_subordinate(
 @pytest.mark.parametrize(
     ("subject_role", "target_role"),
     [
-        (UserRole.SUPER_ADMIN, UserRole.SUPER_ADMIN),
-        (UserRole.ADMIN, UserRole.SUPER_ADMIN),
         (UserRole.ADMIN, UserRole.ADMIN),
+        (UserRole.MODERATOR, UserRole.ADMIN),
+        (UserRole.MODERATOR, UserRole.MODERATOR),
         (UserRole.USER, UserRole.ADMIN),
+        (UserRole.USER, UserRole.MODERATOR),
+        (UserRole.USER, UserRole.USER),
+        (UserRole.GUEST, UserRole.ADMIN),
+        (UserRole.GUEST, UserRole.MODERATOR),
+        (UserRole.GUEST, UserRole.USER),
+        (UserRole.GUEST, UserRole.GUEST),
     ],
 )
 def test_cannot_manage_non_subordinate(
@@ -77,9 +86,12 @@ def test_cannot_manage_non_subordinate(
 @pytest.mark.parametrize(
     ("subject_role", "target_role"),
     [
-        (UserRole.SUPER_ADMIN, UserRole.ADMIN),
-        (UserRole.SUPER_ADMIN, UserRole.USER),
+        (UserRole.ADMIN, UserRole.MODERATOR),
         (UserRole.ADMIN, UserRole.USER),
+        (UserRole.ADMIN, UserRole.GUEST),
+        (UserRole.MODERATOR, UserRole.USER),
+        (UserRole.MODERATOR, UserRole.GUEST),
+        (UserRole.USER, UserRole.GUEST),
     ],
 )
 def test_can_manage_role(
@@ -96,10 +108,16 @@ def test_can_manage_role(
 @pytest.mark.parametrize(
     ("subject_role", "target_role"),
     [
-        (UserRole.SUPER_ADMIN, UserRole.SUPER_ADMIN),
-        (UserRole.ADMIN, UserRole.SUPER_ADMIN),
         (UserRole.ADMIN, UserRole.ADMIN),
+        (UserRole.MODERATOR, UserRole.ADMIN),
+        (UserRole.MODERATOR, UserRole.MODERATOR),
         (UserRole.USER, UserRole.ADMIN),
+        (UserRole.USER, UserRole.MODERATOR),
+        (UserRole.USER, UserRole.USER),
+        (UserRole.GUEST, UserRole.ADMIN),
+        (UserRole.GUEST, UserRole.MODERATOR),
+        (UserRole.GUEST, UserRole.USER),
+        (UserRole.GUEST, UserRole.GUEST),
     ],
 )
 def test_cannot_manage_role(

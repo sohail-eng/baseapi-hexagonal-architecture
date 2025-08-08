@@ -5,7 +5,7 @@ from typing import Any, cast
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.application.common.ports.flusher import Flusher
-from app.domain.exceptions.user import UsernameAlreadyExistsError
+from app.domain.exceptions.user import EmailAlreadyExistsError
 from app.infrastructure.adapters.constants import (
     DB_CONSTRAINT_VIOLATION,
     DB_FLUSH_DONE,
@@ -25,17 +25,18 @@ class SqlaMainFlusher(Flusher):
     async def flush(self) -> None:
         """
         :raises DataMapperError:
-        :raises UsernameAlreadyExists:
+        :raises EmailAlreadyExistsError:
         """
         try:
             await self._session.flush()
             log.debug("%s Main session.", DB_FLUSH_DONE)
 
         except IntegrityError as error:
-            if "uq_users_username" in str(error):
+            # Check for email uniqueness constraint violation
+            if "uq_users_email" in str(error) or "email" in str(error).lower():
                 params: Mapping[str, Any] = cast(Mapping[str, Any], error.params)
-                username = str(params.get("username", "unknown"))
-                raise UsernameAlreadyExistsError(username) from error
+                email = str(params.get("email", "unknown"))
+                raise EmailAlreadyExistsError(email) from error
 
             raise DataMapperError(DB_CONSTRAINT_VIOLATION) from error
 

@@ -7,8 +7,9 @@ from app.domain.enums.user_role import UserRole
     ("role", "expected"),
     [
         (UserRole.USER, True),
-        (UserRole.ADMIN, True),
-        (UserRole.SUPER_ADMIN, False),
+        (UserRole.MODERATOR, True),
+        (UserRole.GUEST, True),
+        (UserRole.ADMIN, False),
     ],
 )
 def test_assignability(role: UserRole, expected: bool) -> None:
@@ -19,8 +20,9 @@ def test_assignability(role: UserRole, expected: bool) -> None:
     ("role", "expected"),
     [
         (UserRole.USER, True),
-        (UserRole.ADMIN, True),
-        (UserRole.SUPER_ADMIN, False),
+        (UserRole.MODERATOR, True),
+        (UserRole.GUEST, True),
+        (UserRole.ADMIN, False),
     ],
 )
 def test_changeability(role: UserRole, expected: bool) -> None:
