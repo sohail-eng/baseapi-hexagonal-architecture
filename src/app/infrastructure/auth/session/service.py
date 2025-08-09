@@ -14,6 +14,7 @@ from app.infrastructure.auth.session.constants import (
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
 )
+from app.infrastructure.auth.refresh_token.generator import RefreshTokenGenerator
 from app.infrastructure.auth.session.model import AuthSession
 from app.infrastructure.auth.session.ports.gateway import (
     AuthSessionGateway,
@@ -36,16 +37,19 @@ class AuthSessionService:
         auth_transaction_manager: AuthSessionTransactionManager,
         auth_session_id_generator: StrAuthSessionIdGenerator,
         auth_session_timer: UtcAuthSessionTimer,
+        refresh_token_generator: RefreshTokenGenerator,
     ):
         self._auth_session_gateway = auth_session_gateway
         self._auth_session_transport = auth_session_transport
         self._auth_transaction_manager = auth_transaction_manager
         self._auth_session_id_generator = auth_session_id_generator
         self._auth_session_timer = auth_session_timer
+        self._refresh_token_generator = refresh_token_generator
         self._cached_auth_session: AuthSession | None = None
 
-    async def create_session(self, user_id: UserId) -> None:
+    async def create_session(self, user_id: UserId) -> tuple[AuthSession, str]:
         """
+        :returns: Created auth session
         :raises AuthenticationError:
         """
         log.debug("Create auth session: started. User ID: '%s'.", user_id.value)
@@ -57,6 +61,8 @@ class AuthSessionService:
             user_id=user_id,
             expiration=expiration,
         )
+        # generate refresh token
+        auth_session.refresh_token = self._refresh_token_generator()
 
         try:
             self._auth_session_gateway.add(auth_session)
@@ -65,13 +71,14 @@ class AuthSessionService:
         except DataMapperError as error:
             raise AuthenticationError(AUTH_IS_UNAVAILABLE) from error
 
-        self._auth_session_transport.deliver(auth_session)
+        access_token = self._auth_session_transport.deliver(auth_session)
 
         log.debug(
             "Create auth session: done. User ID: '%s', Auth session id: '%s'.",
             user_id.value,
             auth_session.id_,
         )
+        return auth_session, access_token
 
     async def get_authenticated_user_id(self) -> UserId:
         """

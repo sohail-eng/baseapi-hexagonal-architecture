@@ -32,7 +32,7 @@ class JwtCookieAuthSessionTransport(AuthSessionTransport):
         self._access_token_processor = access_token_processor
         self._cookie_params = cookie_params
 
-    def deliver(self, auth_session: AuthSession) -> None:
+    def deliver(self, auth_session: AuthSession) -> str:
         access_token = self._access_token_processor.encode(auth_session)
         setattr(self._request.state, REQUEST_STATE_NEW_ACCESS_TOKEN_KEY, access_token)
         setattr(
@@ -46,6 +46,7 @@ class JwtCookieAuthSessionTransport(AuthSessionTransport):
             ACCESS_TOKEN_DELIVERED_VIA_COOKIE,
             auth_session.id_,
         )
+        return access_token
 
     def extract_id(self) -> str | None:
         access_token = self._request.cookies.get(COOKIE_ACCESS_TOKEN_NAME)

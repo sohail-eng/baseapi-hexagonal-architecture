@@ -17,3 +17,4 @@ class AuthSession:
     id_: str
     user_id: UserId
     expiration: datetime
+    refresh_token: str | None = None

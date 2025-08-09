@@ -7,6 +7,7 @@ from app.infrastructure.adapters.user_data_mapper_sqla import (
     SqlaUserDataMapper,
 )
 from app.infrastructure.adapters.user_reader_sqla import SqlaUserReader
+from app.infrastructure.adapters.session_recorder_sqla import SqlaSessionRecorder
 from app.infrastructure.auth.adapters.data_mapper_sqla import (
     SqlaAuthSessionDataMapper,
 )
@@ -22,6 +23,7 @@ from app.infrastructure.auth.handlers.sign_up import SignUpHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
 )
+from app.infrastructure.auth.refresh_token.generator import RefreshTokenGenerator
 from app.infrastructure.auth.session.ports.gateway import AuthSessionGateway
 from app.infrastructure.auth.session.ports.transaction_manager import (
     AuthSessionTransactionManager,
@@ -29,6 +31,7 @@ from app.infrastructure.auth.session.ports.transaction_manager import (
 from app.infrastructure.auth.session.ports.transport import AuthSessionTransport
 from app.infrastructure.auth.session.service import AuthSessionService
 from app.infrastructure.auth.session.timer_utc import UtcAuthSessionTimer
+from app.application.common.ports.session_recorder import SessionRecorder
 from app.infrastructure.persistence_sqla.provider import (
     get_async_engine,
     get_async_session_factory,
@@ -50,6 +53,11 @@ class InfrastructureProvider(Provider):
     auth_session_gateway = provide(
         source=SqlaAuthSessionDataMapper,
         provides=AuthSessionGateway,
+    )
+    # Session Recorder Port
+    session_recorder = provide(
+        source=SqlaSessionRecorder,
+        provides=SessionRecorder,
     )
     auth_session_tx_manager = provide(
         source=SqlaAuthSessionTransactionManager,
@@ -73,9 +81,11 @@ class InfrastructureProvider(Provider):
     infra_objects = provide_all(
         StrAuthSessionIdGenerator,
         UtcAuthSessionTimer,
+        RefreshTokenGenerator,
         AuthSessionIdentityProvider,
         SqlaAuthSessionDataMapper,
         SqlaAuthSessionTransactionManager,
+        SqlaSessionRecorder,
         SqlaUserDataMapper,
         SqlaUserReader,
         SqlaMainTransactionManager,

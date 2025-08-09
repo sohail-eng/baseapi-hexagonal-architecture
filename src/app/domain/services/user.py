@@ -27,6 +27,7 @@ from app.domain.value_objects.city_id import CityId
 from app.domain.value_objects.subscription import Subscription
 from app.domain.value_objects.created_at import CreatedAt
 from app.domain.value_objects.updated_at import UpdatedAt
+from app.domain.value_objects.last_login import LastLogin
 
 
 class UserService:
@@ -115,4 +116,19 @@ class UserService:
         if not user.role.is_changeable:
             raise RoleChangeNotPermittedError(user.email, user.role)
         user.role = UserRole.ADMIN if is_admin else UserRole.USER
+        user.updated_at = UpdatedAt(datetime.utcnow())
+
+    def increment_login_retry_count(self, user: User) -> None:
+        """
+        Increments the user's failed login retry count and updates timestamp.
+        """
+        user.retry_count = RetryCount(user.retry_count.value + 1)
+        user.updated_at = UpdatedAt(datetime.utcnow())
+
+    def record_successful_login(self, user: User) -> None:
+        """
+        Resets retry count and sets last login timestamp.
+        """
+        user.retry_count = RetryCount(0)
+        user.last_login = LastLogin(datetime.utcnow())
         user.updated_at = UpdatedAt(datetime.utcnow())
