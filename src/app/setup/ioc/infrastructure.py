@@ -44,8 +44,8 @@ from app.infrastructure.persistence_sqla.provider import (
     get_auth_async_session,
     get_main_async_session,
 )
-from app.presentation.http.auth.adapters.session_transport_jwt_cookie import (
-    JwtCookieAuthSessionTransport,
+from app.presentation.http.auth.adapters.session_transport_jwt_header import (
+    JwtHeaderAuthSessionTransport,
 )
 from app.infrastructure.adapters.session_store_sqla import SqlaSessionStore
 
@@ -73,7 +73,7 @@ class InfrastructureProvider(Provider):
 
     # Auth Ports
     auth_session_transport = provide(
-        source=JwtCookieAuthSessionTransport,
+        source=JwtHeaderAuthSessionTransport,
         provides=AuthSessionTransport,
     )
     country_query_gateway = provide(

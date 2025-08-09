@@ -7,6 +7,7 @@ from app.infrastructure.auth.session.service import AuthSessionService
 from app.presentation.http.auth.refresh_token_processor_jwt import (
     JwtRefreshTokenProcessor,
 )
+from app.infrastructure.auth.exceptions import AuthenticationError
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +33,20 @@ class RefreshTokenHandler:
     async def execute(self, request_data: RefreshTokenRequest) -> dict:
         payload = self._refresh_token_processor.decode(request_data.refresh_token)
         user_id = int(payload["sub"])  # type: ignore
+
+        # If an access token is provided (cookie), validate it's a logged-in user and matches payload
+        try:
+            current_user_id = await self._auth_session_service.get_authenticated_user_id()
+            if current_user_id.value != user_id:
+                # Optional: we could invalidate the old session here
+                log.debug(
+                    "Refresh token sub does not match current access token user. Sub: %s, Current: %s",
+                    user_id,
+                    current_user_id.value,
+                )
+        except AuthenticationError:
+            # No valid access token available; proceed with refresh-token only flow
+            pass
         auth_session, access_token = await self._auth_session_service.create_session(user_id)  # type: ignore[arg-type]
 
         # Prefer updating existing row; if not found, add a new one

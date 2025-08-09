@@ -2,7 +2,7 @@ from inspect import getdoc
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, Security, status
+from fastapi import APIRouter, status
 from fastapi_error_map import ErrorAwareRouter, rule
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -20,7 +20,6 @@ from app.domain.exceptions.user import (
 )
 from app.infrastructure.auth.exceptions import AuthenticationError
 from app.infrastructure.exceptions.gateway import DataMapperError
-from app.presentation.http.auth.fastapi_openapi_markers import cookie_scheme
 from app.presentation.http.errors.callbacks import log_error, log_info
 from app.presentation.http.errors.translators import (
     ServiceUnavailableTranslator,
@@ -62,7 +61,6 @@ def create_create_user_router() -> APIRouter:
         },
         default_on_error=log_info,
         status_code=status.HTTP_201_CREATED,
-        dependencies=[Security(cookie_scheme)],
     )
     @inject
     async def create_user(

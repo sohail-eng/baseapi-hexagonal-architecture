@@ -18,7 +18,7 @@ from app.domain.exceptions.user import (
 )
 from app.infrastructure.auth.exceptions import AuthenticationError
 from app.infrastructure.exceptions.gateway import DataMapperError
-from app.presentation.http.auth.fastapi_openapi_markers import cookie_scheme
+from app.presentation.http.auth.fastapi_openapi_markers import bearer_scheme
 from app.presentation.http.errors.callbacks import log_error, log_info
 from app.presentation.http.errors.translators import (
     ServiceUnavailableTranslator,
@@ -45,7 +45,7 @@ def create_deactivate_user_router() -> APIRouter:
         },
         default_on_error=log_info,
         status_code=status.HTTP_204_NO_CONTENT,
-        dependencies=[Security(cookie_scheme)],
+        dependencies=[Security(bearer_scheme)],
     )
     @inject
     async def deactivate_user(
