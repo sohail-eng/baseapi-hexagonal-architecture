@@ -2,7 +2,7 @@ from inspect import getdoc
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from fastapi_error_map import ErrorAwareRouter, rule
 
 from app.application.common.exceptions.authorization import AuthorizationError
@@ -17,6 +17,7 @@ from app.infrastructure.auth.handlers.sign_up import (
     SignUpRequest,
     SignUpResponse,
 )
+from app.domain.exceptions.location import CountryNotFoundError, CityNotFoundInCountryError
 from app.infrastructure.exceptions.gateway import DataMapperError
 from app.presentation.http.errors.callbacks import (
     log_error,
@@ -36,6 +37,8 @@ def create_sign_up_router() -> APIRouter:
         error_map={
             AlreadyAuthenticatedError: status.HTTP_403_FORBIDDEN,
             AuthorizationError: status.HTTP_403_FORBIDDEN,
+            CountryNotFoundError: status.HTTP_400_BAD_REQUEST,
+            CityNotFoundInCountryError: status.HTTP_400_BAD_REQUEST,
             DataMapperError: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),
@@ -52,7 +55,16 @@ def create_sign_up_router() -> APIRouter:
     async def sign_up(
         request_data: SignUpRequest,
         handler: FromDishka[SignUpHandler],
+        request: Request,
     ) -> SignUpResponse:
-        return await handler.execute(request_data)
+        enriched_request = SignUpRequest(
+            email=request_data.email,
+            first_name=request_data.first_name,
+            last_name=request_data.last_name,
+            password=request_data.password,
+            ip_address=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
+        return await handler.execute(enriched_request)
 
     return router

@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TypedDict
 
 from app.application.common.ports.flusher import Flusher
@@ -7,12 +8,15 @@ from app.application.common.ports.transaction_manager import TransactionManager
 from app.application.common.ports.user_command_gateway import UserCommandGateway
 from app.application.common.services.current_user import CurrentUserService
 from app.domain.exceptions.user import EmailAlreadyExistsError
+from app.domain.exceptions.location import CountryNotFoundError, CityNotFoundInCountryError
 from app.domain.services.user import UserService
 from app.domain.value_objects.raw_password.raw_password import RawPassword
 from app.domain.value_objects.email import Email
 from app.domain.value_objects.first_name import FirstName
 from app.domain.value_objects.last_name import LastName
 from app.domain.value_objects.language import Language
+from app.domain.value_objects.country_id import CountryId
+from app.domain.value_objects.city_id import CityId
 from app.infrastructure.auth.exceptions import (
     AlreadyAuthenticatedError,
     AuthenticationError,
@@ -20,6 +24,10 @@ from app.infrastructure.auth.exceptions import (
 from app.infrastructure.auth.handlers.constants import (
     AUTH_ALREADY_AUTHENTICATED,
 )
+from app.infrastructure.auth.session.service import AuthSessionService
+from app.application.common.ports.session_recorder import SessionRecorder
+from app.application.common.ports.country_query_gateway import CountryQueryGateway
+from app.application.common.ports.city_query_gateway import CityQueryGateway
 
 log = logging.getLogger(__name__)
 
@@ -30,10 +38,19 @@ class SignUpRequest:
     first_name: str
     last_name: str
     password: str
+    ip_address: str | None = None
+    user_agent: str | None = None
 
 
 class SignUpResponse(TypedDict):
     id: int
+    session_id: str
+    user_id: int
+    expires_at: str
+    access_token: str
+    refresh_token: str
+    token_type: str
+    is_active: bool
 
 
 class SignUpHandler:
@@ -51,12 +68,20 @@ class SignUpHandler:
         user_command_gateway: UserCommandGateway,
         flusher: Flusher,
         transaction_manager: TransactionManager,
+        auth_session_service: AuthSessionService,
+        session_recorder: SessionRecorder,
+        country_query_gateway: CountryQueryGateway,
+        city_query_gateway: CityQueryGateway,
     ):
         self._current_user_service = current_user_service
         self._user_service = user_service
         self._user_command_gateway = user_command_gateway
         self._flusher = flusher
         self._transaction_manager = transaction_manager
+        self._auth_session_service = auth_session_service
+        self._session_recorder = session_recorder
+        self._country_query_gateway = country_query_gateway
+        self._city_query_gateway = city_query_gateway
 
     async def execute(self, request_data: SignUpRequest) -> SignUpResponse:
         """
@@ -81,12 +106,26 @@ class SignUpHandler:
         password = RawPassword(request_data.password)
         language = Language("en")
 
+        # Optional fields validation and mapping
+        country_id = None
+        city_id = None
+        if hasattr(request_data, "country_id") and request_data.country_id is not None:
+            if not await self._country_query_gateway.exists(request_data.country_id):
+                raise CountryNotFoundError(request_data.country_id)
+            country_id = request_data.country_id
+        if hasattr(request_data, "city_id") and request_data.city_id is not None and country_id is not None:
+            if not await self._city_query_gateway.exists_in_country(request_data.city_id, country_id):
+                raise CityNotFoundInCountryError(request_data.city_id, country_id)
+            city_id = request_data.city_id
+
         user = self._user_service.create_user(
             email=email,
             first_name=first_name,
             last_name=last_name,
             password=password,
             language=language,
+            country_id=CountryId(country_id) if country_id is not None else None,
+            city_id=CityId(city_id) if city_id is not None else None,
         )
 
         self._user_command_gateway.add(user)
@@ -98,5 +137,32 @@ class SignUpHandler:
 
         await self._transaction_manager.commit()
 
+        # Auto-login: create auth session and persist session row
+        auth_session, access_token = await self._auth_session_service.create_session(
+            user.id,
+        )
+        await self._session_recorder.add(
+            user_id=user.id.value,
+            access_token=access_token,
+            refresh_token=auth_session.refresh_token or "",
+            token_type="bearer",
+            ip_address=request_data.ip_address,
+            user_agent=request_data.user_agent,
+            created_at=datetime.utcnow(),
+            expires_at=auth_session.expiration,
+            last_activity=datetime.utcnow(),
+            is_active=True,
+        )
+        await self._transaction_manager.commit()
+
         log.info("Sign up: done. Email: '%s'.", user.email.value)
-        return SignUpResponse(id=user.id.value)
+        return SignUpResponse(
+            id=user.id.value,
+            session_id=auth_session.id_,
+            user_id=user.id.value,
+            expires_at=auth_session.expiration.isoformat(),
+            access_token=access_token,
+            refresh_token=auth_session.refresh_token or "",
+            token_type="bearer",
+            is_active=True,
+        )
