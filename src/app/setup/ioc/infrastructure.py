@@ -52,6 +52,8 @@ from app.infrastructure.persistence_sqla.provider import (
 from app.presentation.http.auth.adapters.session_transport_jwt_header import (
     JwtHeaderAuthSessionTransport,
 )
+from app.infrastructure.atlas.handlers.init_cities import InitCitiesHandler
+from app.infrastructure.atlas.handlers.init_countries import InitCountriesHandler
 from app.infrastructure.adapters.session_store_sqla import SqlaSessionStore
 
 
@@ -119,6 +121,8 @@ class InfrastructureProvider(Provider):
         SqlaUserDataMapper,
         SqlaUserReader,
         SqlaMainTransactionManager,
+        InitCountriesHandler,
+        InitCitiesHandler,
     )
 
 
