@@ -61,7 +61,9 @@ class InitCitiesHandler:
                 for row in reader:
                     total += 1
                     try:
-                        # 0: city_id, 1: name, 2: state_id, 3: state_code, 4: state_name, 5: country_id, 6: country_code, 7: country_name
+                        # Columns (baseapi):
+                        # 0: city_id, 1: name, 2: state_id, 3: state_code, 4: state_name,
+                        # 5: country_id, 6: country_code, 7: country_name, 8: latitude, 9: longitude, 10: wikiDataId
                         city_id = int(row[0])
                         name = str(row[1])
                         state_id = str(row[2]) if row[2] else None
@@ -70,6 +72,15 @@ class InitCitiesHandler:
                         country_id_ext = int(row[5])
                         country_code = str(row[6]) if row[6] else None
                         country_name = str(row[7]) if row[7] else None
+                        # coordinates
+                        def parse_float(v):
+                            try:
+                                return float(v)
+                            except Exception:
+                                return None
+                        latitude = parse_float(row[8]) if len(row) > 8 else None
+                        longitude = parse_float(row[9]) if len(row) > 9 else None
+                        wikiDataId = str(row[10]) if len(row) > 10 and row[10] else None
 
                         # Resolve internal country.id by external country_id
                         country_row = (
@@ -111,6 +122,9 @@ class InitCitiesHandler:
                                     state_name=state_name,
                                     country_code=country_code,
                                     country_name=country_name,
+                                    latitude=latitude,
+                                    longitude=longitude,
+                                    wikiDataId=wikiDataId,
                                 )
                             )
                             updated += 1
@@ -125,6 +139,9 @@ class InitCitiesHandler:
                                     country_id=country_pk,
                                     country_code=country_code,
                                     country_name=country_name,
+                                    latitude=latitude,
+                                    longitude=longitude,
+                                    wikiDataId=wikiDataId,
                                 )
                             )
                             added += 1

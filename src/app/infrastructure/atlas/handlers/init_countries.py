@@ -58,13 +58,56 @@ class InitCountriesHandler:
                 for row in reader:
                     total += 1
                     try:
-                        # Expected CSV columns (subset used):
-                        # 0: country_id, 1: name, 2: iso3, 3: iso2
+                        # Expected CSV columns (see baseapi):
+                        # 0: country_id, 1: name, 2: iso3, 3: iso2, 4: numeric_code, 5: phonecode,
+                        # 6: capital, 7: currency, 8: currency_name, 9: currency_symbol, 10: tld,
+                        # 11: native, 12: region, 14: subregion, 16: nationality, 17: timezones,
+                        # 18: latitude, 19: longitude, 20: emoji, 21: emojiU
                         country_id = int(row[0])
                         name = str(row[1])
                         iso3 = str(row[2]) if row[2] else None
                         raw_iso2 = (row[3] or "").strip().upper()
                         iso2 = raw_iso2 if len(raw_iso2) == 2 and raw_iso2.isalpha() else None
+                        # numeric_code formatted to 3 digits if numeric
+                        raw_numeric = row[4]
+                        numeric_code = None
+                        if raw_numeric not in (None, ""):
+                            try:
+                                numeric_code = f"{int(raw_numeric):03d}"
+                            except Exception:
+                                numeric_code = str(raw_numeric)
+                        phonecode = str(row[5]) if row[5] else None
+                        if phonecode and not phonecode.startswith("+"):
+                            phonecode = f"+{phonecode}"
+                        capital = str(row[6]) if row[6] else None
+                        currency = str(row[7]) if row[7] else None
+                        currency_name = str(row[8]) if row[8] else None
+                        currency_symbol = str(row[9]) if row[9] else None
+                        tld = str(row[10]) if row[10] else None
+                        native = str(row[11]) if row[11] else None
+                        region = str(row[12]) if row[12] else None
+                        subregion = str(row[14]) if row[14] else None
+                        nationality = str(row[16]) if row[16] else None
+                        # timezones: expect list-like string; store as JSON array
+                        timezones_raw = row[17]
+                        timezones = None
+                        if timezones_raw and timezones_raw not in ("[]", "null"):
+                            try:
+                                # naive parse: split on '}, {' after trimming brackets
+                                import ast
+                                timezones = ast.literal_eval(timezones_raw)
+                            except Exception:
+                                timezones = None
+                        # coordinates
+                        def parse_float(v):
+                            try:
+                                return float(v)
+                            except Exception:
+                                return None
+                        latitude = parse_float(row[18]) if len(row) > 18 else None
+                        longitude = parse_float(row[19]) if len(row) > 19 else None
+                        emoji = str(row[20]) if len(row) > 20 and row[20] else None
+                        emojiU = str(row[21]) if len(row) > 21 and row[21] else None
 
                         select_stmt: Select = select(Countries.c.id).where(
                             Countries.c.country_id == country_id
@@ -75,7 +118,27 @@ class InitCountriesHandler:
                             await self.session.execute(
                                 Countries.update()
                                 .where(Countries.c.country_id == country_id)
-                                .values(name=name, iso3=iso3, iso2=iso2)
+                                .values(
+                                    name=name,
+                                    iso3=iso3,
+                                    iso2=iso2,
+                                    numeric_code=numeric_code,
+                                    phonecode=phonecode,
+                                    capital=capital,
+                                    currency=currency,
+                                    currency_name=currency_name,
+                                    currency_symbol=currency_symbol,
+                                    tld=tld,
+                                    native=native,
+                                    region=region,
+                                    subregion=subregion,
+                                    nationality=nationality,
+                                    timezones=timezones,
+                                    latitude=latitude,
+                                    longitude=longitude,
+                                    emoji=emoji,
+                                    emojiU=emojiU,
+                                )
                             )
                             updated += 1
                         else:
@@ -85,6 +148,22 @@ class InitCountriesHandler:
                                     name=name,
                                     iso3=iso3,
                                     iso2=iso2,
+                                    numeric_code=numeric_code,
+                                    phonecode=phonecode,
+                                    capital=capital,
+                                    currency=currency,
+                                    currency_name=currency_name,
+                                    currency_symbol=currency_symbol,
+                                    tld=tld,
+                                    native=native,
+                                    region=region,
+                                    subregion=subregion,
+                                    nationality=nationality,
+                                    timezones=timezones,
+                                    latitude=latitude,
+                                    longitude=longitude,
+                                    emoji=emoji,
+                                    emojiU=emojiU,
                                 )
                             )
                             added += 1
