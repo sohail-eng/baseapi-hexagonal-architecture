@@ -2,7 +2,6 @@ from dishka import Provider, Scope, provide, provide_all
 
 from app.application.commands.user.activate_user import ActivateUserInteractor
 from app.application.commands.user.change_password import ChangePasswordInteractor
-from app.application.commands.user.create_user import CreateUserInteractor
 from app.application.commands.user.deactivate_user import DeactivateUserInteractor
 from app.application.commands.user.grant_admin import GrantAdminInteractor
 from app.application.commands.user.revoke_admin import RevokeAdminInteractor
@@ -16,6 +15,11 @@ from app.application.common.ports.user_command_gateway import UserCommandGateway
 from app.application.common.ports.user_query_gateway import UserQueryGateway
 from app.application.common.services.current_user import CurrentUserService
 from app.application.queries.list_users import ListUsersQueryService
+from app.application.atlas.queries import (
+    SearchCountriesQueryService,
+    SearchCitiesQueryService,
+    ListStatesByCountryQueryService,
+)
 from app.infrastructure.adapters.main_flusher_sqla import SqlaMainFlusher
 from app.infrastructure.adapters.main_transaction_manager_sqla import (
     SqlaMainTransactionManager,
@@ -72,7 +76,6 @@ class ApplicationProvider(Provider):
     commands = provide_all(
         ActivateUserInteractor,
         ChangePasswordInteractor,
-        CreateUserInteractor,
         DeactivateUserInteractor,
         GrantAdminInteractor,
         RevokeAdminInteractor,
@@ -81,4 +84,7 @@ class ApplicationProvider(Provider):
     # Queries
     query_services = provide_all(
         ListUsersQueryService,
+        SearchCountriesQueryService,
+        SearchCitiesQueryService,
+        ListStatesByCountryQueryService,
     )

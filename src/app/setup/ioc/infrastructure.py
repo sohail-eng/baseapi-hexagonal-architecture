@@ -13,6 +13,10 @@ from app.infrastructure.adapters.session_recorder_sqla import SqlaSessionRecorde
 from app.infrastructure.auth.adapters.data_mapper_sqla import (
     SqlaAuthSessionDataMapper,
 )
+from app.infrastructure.atlas.readers_sqla import (
+    SqlaCityReader as AtlasSqlaCityReader,
+    SqlaCountryReader as AtlasSqlaCountryReader,
+)
 from app.infrastructure.auth.adapters.identity_provider import (
     AuthSessionIdentityProvider,
 )
@@ -35,6 +39,7 @@ from app.infrastructure.auth.session.ports.transport import AuthSessionTransport
 from app.infrastructure.auth.session.service import AuthSessionService
 from app.infrastructure.auth.session.timer_utc import UtcAuthSessionTimer
 from app.application.common.ports.session_recorder import SessionRecorder
+from app.application.atlas.ports import CityReader as AtlasCityReader, CountryReader as AtlasCountryReader
 from app.application.common.ports.session_store import SessionStore
 from app.application.common.ports.country_query_gateway import CountryQueryGateway
 from app.application.common.ports.city_query_gateway import CityQueryGateway
@@ -83,6 +88,14 @@ class InfrastructureProvider(Provider):
     city_query_gateway = provide(
         source=SqlaCityReader,
         provides=CityQueryGateway,
+    )
+    atlas_country_reader = provide(
+        source=AtlasSqlaCountryReader,
+        provides=AtlasCountryReader,
+    )
+    atlas_city_reader = provide(
+        source=AtlasSqlaCityReader,
+        provides=AtlasCityReader,
     )
 
     # Infrastructure Handlers
