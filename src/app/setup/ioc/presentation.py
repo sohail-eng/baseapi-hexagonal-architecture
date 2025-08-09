@@ -4,6 +4,9 @@ from starlette.requests import Request
 from app.presentation.http.auth.access_token_processor_jwt import (
     JwtAccessTokenProcessor,
 )
+from app.presentation.http.auth.refresh_token_processor_jwt import (
+    JwtRefreshTokenProcessor,
+)
 
 
 class PresentationProvider(Provider):
@@ -14,4 +17,5 @@ class PresentationProvider(Provider):
     # Concrete Objects
     presentation_objects = provide_all(
         JwtAccessTokenProcessor,
+        JwtRefreshTokenProcessor,
     )

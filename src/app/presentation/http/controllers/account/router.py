@@ -7,6 +7,9 @@ from app.presentation.http.controllers.account.log_out import (
 from app.presentation.http.controllers.account.sign_up import (
     create_sign_up_router,
 )
+from app.presentation.http.controllers.account.refresh_token import (
+    create_refresh_token_router,
+)
 
 
 def create_account_router() -> APIRouter:
@@ -19,6 +22,7 @@ def create_account_router() -> APIRouter:
         create_sign_up_router(),
         create_log_in_router(),
         create_log_out_router(),
+        create_refresh_token_router(),
     )
 
     for sub_router in sub_routers:

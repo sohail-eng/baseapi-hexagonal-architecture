@@ -22,6 +22,7 @@ from app.infrastructure.auth.adapters.transaction_manager_sqla import (
 from app.infrastructure.auth.handlers.log_in import LogInHandler
 from app.infrastructure.auth.handlers.log_out import LogOutHandler
 from app.infrastructure.auth.handlers.sign_up import SignUpHandler
+from app.infrastructure.auth.handlers.refresh_token import RefreshTokenHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
 )
@@ -34,6 +35,7 @@ from app.infrastructure.auth.session.ports.transport import AuthSessionTransport
 from app.infrastructure.auth.session.service import AuthSessionService
 from app.infrastructure.auth.session.timer_utc import UtcAuthSessionTimer
 from app.application.common.ports.session_recorder import SessionRecorder
+from app.application.common.ports.session_store import SessionStore
 from app.application.common.ports.country_query_gateway import CountryQueryGateway
 from app.application.common.ports.city_query_gateway import CityQueryGateway
 from app.infrastructure.persistence_sqla.provider import (
@@ -45,6 +47,7 @@ from app.infrastructure.persistence_sqla.provider import (
 from app.presentation.http.auth.adapters.session_transport_jwt_cookie import (
     JwtCookieAuthSessionTransport,
 )
+from app.infrastructure.adapters.session_store_sqla import SqlaSessionStore
 
 
 class InfrastructureProvider(Provider):
@@ -87,6 +90,7 @@ class InfrastructureProvider(Provider):
         SignUpHandler,
         LogInHandler,
         LogOutHandler,
+        RefreshTokenHandler,
     )
 
     # Concrete Objects
@@ -98,6 +102,7 @@ class InfrastructureProvider(Provider):
         SqlaAuthSessionDataMapper,
         SqlaAuthSessionTransactionManager,
         SqlaSessionRecorder,
+        SqlaSessionStore,
         SqlaUserDataMapper,
         SqlaUserReader,
         SqlaMainTransactionManager,
