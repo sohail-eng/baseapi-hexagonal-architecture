@@ -10,11 +10,14 @@ from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 
 def map_sessions_table() -> None:
-    """Map Session entity to database table."""
-    
+    """Map Session entity to database table (idempotent)."""
+    if "sessions" in mapping_registry.metadata.tables:
+        return
+
     @mapping_registry.mapped
     class SessionsTable:
         __tablename__ = "sessions"
+        __table_args__ = {"extend_existing": True}
         
         # Primary key
         id = mapped_column(Integer, primary_key=True, index=True)

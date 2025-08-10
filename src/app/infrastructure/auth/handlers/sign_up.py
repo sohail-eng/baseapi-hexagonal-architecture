@@ -116,13 +116,12 @@ class SignUpHandler:
         country_id = None
         city_id = None
         if request_data.country_id is not None:
-            c_id_vo = CountryId(request_data.country_id)
-            if not await self._country_query_gateway.exists(c_id_vo):
+            c_id = request_data.country_id
+            if not await self._country_query_gateway.exists(c_id):
                 raise CountryNotFoundError(request_data.country_id)
-            country_id = request_data.country_id
+            country_id = c_id
         if request_data.city_id is not None and country_id is not None:
-            city_id_vo = CityId(request_data.city_id)
-            if not await self._city_query_gateway.exists_in_country(city_id_vo, CountryId(country_id)):
+            if not await self._city_query_gateway.exists_in_country(request_data.city_id, country_id):
                 raise CityNotFoundInCountryError(request_data.city_id, country_id)
             city_id = request_data.city_id
 
