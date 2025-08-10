@@ -19,7 +19,7 @@ authors = [
 ]
 requires-python = "==3.12.*"
 dependencies = [
-    "alembic==1.16.4",
+    "alembic",
     "alembic-postgresql-enum==1.8.0",
     "bcrypt==4.3.0",
     "dishka==1.6.0",
@@ -28,7 +28,7 @@ dependencies = [
     "orjson==3.11.0",
     "psycopg[binary]==3.2.9",
     "pydantic[email]==2.11.7",
-    "pyjwt[crypto]==2.10.1",
+    "pyjwt[crypto]",
     "rtoml==0.12.0",
     "sqlalchemy[mypy]==2.0.41",
     "uuid6==2025.0.1",

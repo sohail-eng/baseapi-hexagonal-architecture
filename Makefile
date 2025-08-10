@@ -9,14 +9,13 @@ env:
 	@echo APP_ENV=$(APP_ENV)
 
 venv:
-	python3.12 -m venv env
+	$(PYTHON) -m venv env
 
-clean-install: venv
-	. env/bin/activate && \
-	python3.12 -m pip install --upgrade pip && \
-	pip install setuptools wheel && \
-	pip uninstall -y bcrypt passlib && \
-	pip install -e .
+clean-install:
+	rm -rf env
+	$(PYTHON) -m venv env
+	./env/bin/python -m pip install --upgrade pip setuptools wheel
+	./env/bin/pip install -e .
 
 dotenv:
 	@$(PYTHON) $(TOML_CONFIG_MANAGER) ${APP_ENV}
