@@ -1,15 +1,15 @@
 import logging
-from typing import Any, Literal, NewType, TypedDict, cast
+from typing import Any, TypedDict, cast
 
 import jwt
 
 from app.domain.enums.user_role import UserRole
+from app.presentation.http.auth.access_token_processor_jwt import (
+    JwtAlgorithm,
+    JwtSecret,
+)
 
 log = logging.getLogger(__name__)
-
-JwtSecret = NewType("JwtSecret", str)
-JwtAlgorithm = Literal["HS256", "HS384", "HS512", "RS256", "RS384", "RS512"]
-
 
 class RefreshPayload(TypedDict):
     sub: str

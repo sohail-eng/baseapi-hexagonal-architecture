@@ -73,6 +73,11 @@ class InfrastructureProvider(Provider):
         source=SqlaSessionRecorder,
         provides=SessionRecorder,
     )
+    # Session Store Port
+    session_store = provide(
+        source=SqlaSessionStore,
+        provides=SessionStore,
+    )
     auth_session_tx_manager = provide(
         source=SqlaAuthSessionTransactionManager,
         provides=AuthSessionTransactionManager,
