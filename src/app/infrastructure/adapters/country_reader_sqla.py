@@ -17,7 +17,10 @@ class SqlaCountryReader(CountryQueryGateway):
     async def exists(self, country_id: int) -> bool:
         try:
             CountriesTable = mapping_registry.metadata.tables["countries"]  # type: ignore
-            select_stmt: Select = select(CountriesTable.c.id).where(CountriesTable.c.country_id == country_id)
+            # Validate against internal primary key `id`
+            select_stmt: Select = select(CountriesTable.c.id).where(
+                CountriesTable.c.id == country_id
+            )
             row = (await self._session.execute(select_stmt)).first()
             return row is not None
         except SQLAlchemyError as error:

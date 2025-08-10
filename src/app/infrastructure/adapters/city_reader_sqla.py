@@ -17,8 +17,9 @@ class SqlaCityReader(CityQueryGateway):
     async def exists_in_country(self, city_id: int, country_id: int) -> bool:
         try:
             CitiesTable = mapping_registry.metadata.tables["cities"]  # type: ignore
+            # country_id here is internal PK from `countries.id` used by cities.country_id
             select_stmt: Select = select(CitiesTable.c.id).where(
-                (CitiesTable.c.city_id == city_id) & (CitiesTable.c.country_id == country_id)
+                (CitiesTable.c.id == city_id) & (CitiesTable.c.country_id == country_id)
             )
             row = (await self._session.execute(select_stmt)).first()
             return row is not None
