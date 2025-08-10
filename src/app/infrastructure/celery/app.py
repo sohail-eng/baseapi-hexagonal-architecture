@@ -16,6 +16,7 @@ def create_celery() -> Celery:
         backend=backend or "redis://localhost:6379/1",
         include=[
             "app.infrastructure.celery.tasks",
+            "app.infrastructure.celery.compat_tasks",
         ],
     )
     app.conf.task_serializer = "json"

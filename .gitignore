@@ -164,7 +164,6 @@ config/dev/*
 !config/dev/.gitkeep
 config/prod/*
 !config/prod/.gitkeep
-.secrets.*
 .env.*
 
 # IgnoreToDo

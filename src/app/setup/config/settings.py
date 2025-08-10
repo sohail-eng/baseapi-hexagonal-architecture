@@ -1,11 +1,10 @@
-from pydantic import (
-    BaseModel,
-)
+from pydantic import BaseModel
 
 from app.setup.config.database import PostgresSettings, SqlaEngineSettings
 from app.setup.config.loader import ValidEnvs, get_current_env, load_full_config
 from app.setup.config.logs import LoggingSettings
 from app.setup.config.security import SecuritySettings
+from app.setup.config.mailgun import MailgunSettings
 
 
 class AppSettings(BaseModel):
@@ -13,6 +12,7 @@ class AppSettings(BaseModel):
     sqla: SqlaEngineSettings
     security: SecuritySettings
     logs: LoggingSettings
+    mailgun: MailgunSettings | None = None
 
 
 def load_settings(env: ValidEnvs | None = None) -> AppSettings:
