@@ -66,7 +66,7 @@ class UserService:
         now = datetime.utcnow()
         
         return User(
-            id=user_id,
+            id_=user_id,
             email=email,
             first_name=first_name,
             last_name=last_name,
