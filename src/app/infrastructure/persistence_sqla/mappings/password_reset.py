@@ -1,7 +1,3 @@
-"""
-SQLAlchemy mapping for PasswordReset table metadata.
-"""
-
 from sqlalchemy import Integer, String, DateTime, Boolean, ForeignKey, text
 from sqlalchemy.orm import mapped_column
 
@@ -10,7 +6,10 @@ from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 def map_password_resets_table() -> None:
     """Map PasswordReset entity to database table."""
-    
+    # Idempotency guard
+    if "password_resets" in mapping_registry.metadata.tables:
+        return
+
     @mapping_registry.mapped
     class PasswordResetsTable:
         __tablename__ = "password_resets"

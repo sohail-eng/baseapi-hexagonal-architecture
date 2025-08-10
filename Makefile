@@ -23,6 +23,20 @@ dotenv:
 start:
 	. env/bin/activate && PYTHONPATH=src python3.12 -m uvicorn app.run:make_app --port 8000 --reload
 
+# Celery
+.PHONY: celery celery.worker celery.beat celery.flower
+celery: venv
+	PYTHONPATH=src ./env/bin/celery -A app.infrastructure.celery.app.celery_app worker -B --loglevel=INFO
+
+celery.worker: venv
+	PYTHONPATH=src ./env/bin/celery -A app.infrastructure.celery.app.celery_app worker --loglevel=INFO
+
+celery.beat: venv
+	PYTHONPATH=src ./env/bin/celery -A app.infrastructure.celery.app.celery_app beat --loglevel=INFO
+
+celery.flower: venv
+	PYTHONPATH=src ./env/bin/flower --broker=redis://localhost:6379/0 --port=5555
+
 alembic:
 	. env/bin/activate && alembic init src/app/infrastructure/persistence_sqla/alembic
 

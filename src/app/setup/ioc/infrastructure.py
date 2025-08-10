@@ -55,6 +55,14 @@ from app.presentation.http.auth.adapters.session_transport_jwt_header import (
 from app.infrastructure.atlas.handlers.init_cities import InitCitiesHandler
 from app.infrastructure.atlas.handlers.init_countries import InitCountriesHandler
 from app.infrastructure.adapters.session_store_sqla import SqlaSessionStore
+from app.infrastructure.maintenance.repositories_sqla import (
+    SqlaAuthSessionRepository,
+    SqlaPasswordResetRepository,
+)
+from app.application.maintenance.ports import (
+    AuthSessionRepository,
+    PasswordResetRepository,
+)
 
 
 class InfrastructureProvider(Provider):
@@ -103,6 +111,14 @@ class InfrastructureProvider(Provider):
     atlas_city_reader = provide(
         source=AtlasSqlaCityReader,
         provides=AtlasCityReader,
+    )
+    auth_session_repo = provide(
+        source=SqlaAuthSessionRepository,
+        provides=AuthSessionRepository,
+    )
+    password_reset_repo = provide(
+        source=SqlaPasswordResetRepository,
+        provides=PasswordResetRepository,
     )
 
     # Infrastructure Handlers
