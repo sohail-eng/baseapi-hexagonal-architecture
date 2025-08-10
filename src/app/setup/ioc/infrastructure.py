@@ -27,6 +27,7 @@ from app.infrastructure.auth.handlers.log_in import LogInHandler
 from app.infrastructure.auth.handlers.log_out import LogOutHandler
 from app.infrastructure.auth.handlers.sign_up import SignUpHandler
 from app.infrastructure.auth.handlers.refresh_token import RefreshTokenHandler
+from app.infrastructure.auth.handlers.verify_email import VerifyEmailHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
 )
@@ -62,6 +63,10 @@ from app.infrastructure.maintenance.repositories_sqla import (
 from app.application.maintenance.ports import (
     AuthSessionRepository,
     PasswordResetRepository,
+)
+from app.application.common.ports.email_verification_repository import EmailVerificationRepository
+from app.infrastructure.adapters.email_verification_repository_sqla import (
+    SqlaEmailVerificationRepository,
 )
 
 
@@ -120,6 +125,10 @@ class InfrastructureProvider(Provider):
         source=SqlaPasswordResetRepository,
         provides=PasswordResetRepository,
     )
+    email_verification_repo = provide(
+        source=SqlaEmailVerificationRepository,
+        provides=EmailVerificationRepository,
+    )
 
     # Infrastructure Handlers
     infra_handlers = provide_all(
@@ -127,6 +136,7 @@ class InfrastructureProvider(Provider):
         LogInHandler,
         LogOutHandler,
         RefreshTokenHandler,
+        VerifyEmailHandler,
     )
 
     # Concrete Objects

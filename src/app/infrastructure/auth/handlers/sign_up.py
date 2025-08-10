@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TypedDict
 
 from app.application.common.ports.flusher import Flusher
@@ -28,6 +28,8 @@ from app.infrastructure.auth.session.service import AuthSessionService
 from app.application.common.ports.session_recorder import SessionRecorder
 from app.application.common.ports.country_query_gateway import CountryQueryGateway
 from app.application.common.ports.city_query_gateway import CityQueryGateway
+from app.application.common.ports.email_verification_repository import EmailVerificationRepository
+from app.infrastructure.celery.app import celery_app
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +77,7 @@ class SignUpHandler:
         session_recorder: SessionRecorder,
         country_query_gateway: CountryQueryGateway,
         city_query_gateway: CityQueryGateway,
-    ):
+        email_verification_repo: EmailVerificationRepository):
         self._current_user_service = current_user_service
         self._user_service = user_service
         self._user_command_gateway = user_command_gateway
@@ -85,6 +87,7 @@ class SignUpHandler:
         self._session_recorder = session_recorder
         self._country_query_gateway = country_query_gateway
         self._city_query_gateway = city_query_gateway
+        self._email_verification_repo = email_verification_repo
 
     async def execute(self, request_data: SignUpRequest) -> SignUpResponse:
         """
@@ -159,8 +162,23 @@ class SignUpHandler:
             is_active=True,
         )
         await self._transaction_manager.commit()
-
+ 
         log.info("Sign up: done. Email: '%s'.", user.email.value)
+        # Create email verification token and send email
+        from secrets import token_urlsafe
+        token = token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=24)
+        await self._email_verification_repo.add(user_id=user.id.value, token=token, expires_at=expires_at)
+        try:
+            celery_app.send_task(
+                "tasks.email_tasks.send_verification_email",
+                kwargs={
+                    "to_email": user.email.value,
+                    "verification_url": token,
+                },
+            )
+        except Exception as e:  # noqa: BLE001
+            log.warning("Failed to enqueue verification email: %s", e)
         return SignUpResponse(
             id=user.id.value,
             session_id=auth_session.id_,

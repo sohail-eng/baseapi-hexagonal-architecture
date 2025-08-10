@@ -80,6 +80,19 @@ def send_password_change_notification(**kwargs: Any) -> None:
         _send_email_via_mailgun(to_email, subject, body)
 
 
+@celery_app.task(name="tasks.email_tasks.send_verification_email")
+def send_verification_email(**kwargs: Any) -> None:
+    to_email = _safe_get(kwargs, "to_email")
+    verification_url = _safe_get(kwargs, "verification_url")
+    subject = "Verify your email"
+    body = (
+        "use the code below to verify your email\n"
+        f"{verification_url}\n\n"
+    )
+    if to_email and verification_url:
+        _send_email_via_mailgun(to_email, subject, body)
+
+
 @celery_app.task(name="invalidate_all_sessions")
 def invalidate_all_sessions_task(**_: Any) -> None:
     # Backward-compatibility stub; no args provided in messages seen.
