@@ -2,7 +2,7 @@
 SQLAlchemy mapping for City table metadata.
 """
 
-from sqlalchemy import Integer, String, Float, CheckConstraint
+from sqlalchemy import Integer, String, Float, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import mapped_column
 
 from app.infrastructure.persistence_sqla.registry import mapping_registry
@@ -38,6 +38,7 @@ def map_cities_table() -> None:
         __table_args__ = (
             CheckConstraint('latitude >= -90 AND latitude <= 90', name='check_city_latitude_range'),
             CheckConstraint('longitude >= -180 AND longitude <= 180', name='check_city_longitude_range'),
+            UniqueConstraint('city_id', 'country_id', name='uq_cities_city_country'),
         )
     
     # Keep only table metadata for create_all
