@@ -1,9 +1,6 @@
-from dataclasses import dataclass
-
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, Depends, status
-from fastapi.security import HTTPBearer
+from fastapi import APIRouter, Security, status
 from fastapi_error_map import ErrorAwareRouter, rule
 
 from app.application.common.exceptions.authorization import AuthorizationError
@@ -11,14 +8,7 @@ from app.infrastructure.auth.handlers.verify_email import VerifyEmailHandler, Ve
 from app.infrastructure.exceptions.gateway import DataMapperError
 from app.presentation.http.errors.callbacks import log_error, log_info
 from app.presentation.http.errors.translators import ServiceUnavailableTranslator
-
-
-bearer_scheme = HTTPBearer()
-
-
-@dataclass(frozen=True, slots=True)
-class VerifyEmailRequest:
-    token: str
+from app.presentation.http.auth.fastapi_openapi_markers import bearer_scheme
 
 
 def create_email_verification_router() -> APIRouter:
@@ -27,7 +17,7 @@ def create_email_verification_router() -> APIRouter:
     @router.put(
         "/email/verify",
         description="Verify email using token for authenticated user.",
-        dependencies=[Depends(bearer_scheme)],
+        dependencies=[Security(bearer_scheme)],
         error_map={
             AuthorizationError: status.HTTP_403_FORBIDDEN,
             DataMapperError: rule(
