@@ -9,13 +9,13 @@ sources = ["src"]
 packages = ["src/app"]
 
 [project]
-name = "fastapi-clean-example"
+name = "baseapi-hexagonal-architecture"
 version = "0.1"
-description = "Framework-agnostic backend example using FastAPI"
+description = "BaseAPI Hexagonal Architecture"
 readme = "README.md"
 license = "MIT"
 authors = [
-    { name = "Ivan Borovets", email = "ivan.r.borovets@gmail.com" },
+    { name = "Matas Baglieri", email = "matiasbaglieri@gmail.com" },
 ]
 requires-python = "==3.12.*"
 dependencies = [
