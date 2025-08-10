@@ -62,6 +62,9 @@ def create_sign_up_router() -> APIRouter:
             first_name=request_data.first_name,
             last_name=request_data.last_name,
             password=request_data.password,
+            country_id=getattr(request_data, "country_id", None),
+            city_id=getattr(request_data, "city_id", None),
+            language=getattr(request_data, "language", None),
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
         )

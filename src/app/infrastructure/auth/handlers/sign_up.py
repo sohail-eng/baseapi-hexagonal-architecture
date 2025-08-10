@@ -38,6 +38,9 @@ class SignUpRequest:
     first_name: str
     last_name: str
     password: str
+    country_id: int | None = None
+    city_id: int | None = None
+    language: str | None = None
     ip_address: str | None = None
     user_agent: str | None = None
 
@@ -104,17 +107,19 @@ class SignUpHandler:
         first_name = FirstName(request_data.first_name)
         last_name = LastName(request_data.last_name)
         password = RawPassword(request_data.password)
-        language = Language("en")
+        language = Language(request_data.language) if request_data.language else Language("en")
 
         # Optional fields validation and mapping
         country_id = None
         city_id = None
-        if hasattr(request_data, "country_id") and request_data.country_id is not None:
-            if not await self._country_query_gateway.exists(request_data.country_id):
+        if request_data.country_id is not None:
+            c_id_vo = CountryId(request_data.country_id)
+            if not await self._country_query_gateway.exists(c_id_vo):
                 raise CountryNotFoundError(request_data.country_id)
             country_id = request_data.country_id
-        if hasattr(request_data, "city_id") and request_data.city_id is not None and country_id is not None:
-            if not await self._city_query_gateway.exists_in_country(request_data.city_id, country_id):
+        if request_data.city_id is not None and country_id is not None:
+            city_id_vo = CityId(request_data.city_id)
+            if not await self._city_query_gateway.exists_in_country(city_id_vo, CountryId(country_id)):
                 raise CityNotFoundInCountryError(request_data.city_id, country_id)
             city_id = request_data.city_id
 
