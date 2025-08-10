@@ -93,10 +93,26 @@ class InitCountriesHandler:
                         timezones_raw = row[17]
                         timezones = None
                         if timezones_raw and timezones_raw not in ("[]", "null"):
+                            # Try strict JSON first
                             try:
                                 timezones = json.loads(timezones_raw)
                             except json.JSONDecodeError:
-                                timezones = None
+                                # Heuristic normalization: quote keys, normalize slashes, convert quotes
+                                import re
+
+                                s = str(timezones_raw).strip()
+                                # Unescape JSON-style slashes
+                                s = s.replace("\\/", "/")
+                                # Quote bare object keys: {zoneName: ...} -> {"zoneName": ...}
+                                s = re.sub(r"([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:", r'\1"\2":', s)
+                                # Replace single quotes with double quotes
+                                s = s.replace("'", '"')
+                                # Final attempt to parse
+                                try:
+                                    timezones = json.loads(s)
+                                    print(timezones)
+                                except json.JSONDecodeError:
+                                    timezones = None
                         # coordinates
                         def parse_float(v):
                             try:
