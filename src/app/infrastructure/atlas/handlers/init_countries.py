@@ -1,4 +1,5 @@
 import csv
+import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -93,10 +94,8 @@ class InitCountriesHandler:
                         timezones = None
                         if timezones_raw and timezones_raw not in ("[]", "null"):
                             try:
-                                # naive parse: split on '}, {' after trimming brackets
-                                import ast
-                                timezones = ast.literal_eval(timezones_raw)
-                            except Exception:
+                                timezones = json.loads(timezones_raw)
+                            except json.JSONDecodeError:
                                 timezones = None
                         # coordinates
                         def parse_float(v):

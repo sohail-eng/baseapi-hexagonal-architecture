@@ -10,6 +10,9 @@ from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 def map_cities_table() -> None:
     """Map City entity to database table."""
+    # Idempotency guard: don't remap if already present
+    if "cities" in mapping_registry.metadata.tables:
+        return
     
     @mapping_registry.mapped
     class CitiesTable:

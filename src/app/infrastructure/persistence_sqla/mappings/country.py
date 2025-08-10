@@ -10,6 +10,9 @@ from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 def map_countries_table() -> None:
     """Map Country entity to database table."""
+    # Idempotency guard: don't remap if already present
+    if "countries" in mapping_registry.metadata.tables:
+        return
     
     @mapping_registry.mapped
     class CountriesTable:
