@@ -14,6 +14,10 @@ fields = [
     "celery.APP_NAME",
     "celery.BROKER_URL",
     "celery.RESULT_BACKEND",
+    # Env overrides consumed by docker-compose
+    "celery.APP_NAME",
+    "celery.BROKER_URL",
+    "celery.RESULT_BACKEND",
     # Mailgun from secrets
     "mailgun.DOMAIN",
     "mailgun.API_KEY",

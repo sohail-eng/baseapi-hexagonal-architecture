@@ -1,3 +1,4 @@
+import os
 from celery import Celery
 
 from app.setup.config.settings import load_settings
@@ -6,9 +7,9 @@ from app.setup.config.settings import load_settings
 def create_celery() -> Celery:
     settings = load_settings()
     celery_cfg = getattr(settings, "celery", {}) if hasattr(settings, "celery") else {}
-    app_name = celery_cfg.get("app_name", "baseapi_hexagonal")
-    broker = celery_cfg.get("broker_url", None)
-    backend = celery_cfg.get("result_backend", None)
+    app_name = os.getenv("CELERY_APP_NAME") or celery_cfg.get("app_name", "baseapi_hexagonal")
+    broker = os.getenv("CELERY_BROKER_URL") or celery_cfg.get("broker_url", None)
+    backend = os.getenv("CELERY_RESULT_BACKEND") or celery_cfg.get("result_backend", None)
 
     app = Celery(
         app_name,
