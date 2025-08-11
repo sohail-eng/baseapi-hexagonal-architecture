@@ -32,8 +32,12 @@ class JwtRefreshTokenProcessor:
         )
         return jwt.encode(cast(dict[str, Any], payload), key=self._secret, algorithm=self._algorithm)
 
-    def decode(self, token: str) -> RefreshPayload:
-        payload = jwt.decode(token, key=self._secret, algorithms=[self._algorithm])
-        return cast(RefreshPayload, payload)
+    def decode(self, token: str) -> RefreshPayload | None:
+        try:
+            payload = jwt.decode(token, key=self._secret, algorithms=[self._algorithm])
+            return cast(RefreshPayload, payload)
+        except jwt.PyJWTError as error:  # includes DecodeError, ExpiredSignatureError, etc.
+            log.debug("Refresh token decode failed: %s", error)
+            return None
 
 

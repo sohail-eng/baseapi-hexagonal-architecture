@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from app.application.common.ports.session_store import SessionStore
+from app.domain.value_objects.user_id import UserId
 from app.infrastructure.auth.session.service import AuthSessionService
 from app.presentation.http.auth.refresh_token_processor_jwt import (
     JwtRefreshTokenProcessor,
@@ -15,8 +16,8 @@ log = logging.getLogger(__name__)
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RefreshTokenRequest:
     refresh_token: str
-    ip_address: str | None
-    user_agent: str | None
+    ip_address: str | None = None
+    user_agent: str | None = None
 
 
 class RefreshTokenHandler:
@@ -31,17 +32,20 @@ class RefreshTokenHandler:
         self._refresh_token_processor = refresh_token_processor
 
     async def execute(self, request_data: RefreshTokenRequest) -> dict:
-        payload = self._refresh_token_processor.decode(request_data.refresh_token)
-        user_id = int(payload["sub"])  # type: ignore
+        # Look up existing session by opaque refresh token instead of decoding JWT
+        row = await self._session_store.read_by_refresh_token(request_data.refresh_token)
+        if row is None:
+            raise AuthenticationError("Invalid or expired refresh token")
+        user_id = UserId(int(row["user_id"]))  # type: ignore[index]
 
         # If an access token is provided (cookie), validate it's a logged-in user and matches payload
         try:
             current_user_id = await self._auth_session_service.get_authenticated_user_id()
-            if current_user_id.value != user_id:
+            if current_user_id.value != user_id.value:
                 # Optional: we could invalidate the old session here
                 log.debug(
                     "Refresh token sub does not match current access token user. Sub: %s, Current: %s",
-                    user_id,
+                    user_id.value,
                     current_user_id.value,
                 )
         except AuthenticationError:
