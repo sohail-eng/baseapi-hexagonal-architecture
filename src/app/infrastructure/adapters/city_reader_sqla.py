@@ -26,4 +26,15 @@ class SqlaCityReader(CityQueryGateway):
         except SQLAlchemyError as error:
             raise ReaderError(DB_QUERY_FAILED) from error
 
+    async def get_pk_in_country(self, city_id: int, country_id: int) -> int | None:
+        try:
+            CitiesTable = mapping_registry.metadata.tables["cities"]  # type: ignore
+            select_stmt: Select = select(CitiesTable.c.id).where(
+                (CitiesTable.c.id == city_id) & (CitiesTable.c.country_id == country_id)
+            )
+            row = (await self._session.execute(select_stmt)).first()
+            return int(row[0]) if row else None
+        except SQLAlchemyError as error:
+            raise ReaderError(DB_QUERY_FAILED) from error
+
 

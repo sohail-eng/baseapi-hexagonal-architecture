@@ -123,7 +123,9 @@ class SignUpHandler:
         if request_data.city_id is not None and country_id is not None:
             if not await self._city_query_gateway.exists_in_country(request_data.city_id, country_id):
                 raise CityNotFoundInCountryError(request_data.city_id, country_id)
-            city_id = request_data.city_id
+            # Translate external city_id to internal PK for FK storage
+            city_pk = await self._city_query_gateway.get_pk_in_country(request_data.city_id, country_id)
+            city_id = city_pk
 
         user = self._user_service.create_user(
             email=email,

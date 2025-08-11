@@ -55,6 +55,7 @@ class ApplicationProvider(Provider):
     user_id_generator = provide(source=UuidUserIdGenerator, provides=UserIdGenerator)
     password_hasher = provide(source=BcryptPasswordHasher, provides=PasswordHasher)
 
+    @staticmethod
     def _password_pepper(settings: PasswordSettings) -> PasswordPepper:  # factory
         return PasswordPepper(settings.pepper)
 

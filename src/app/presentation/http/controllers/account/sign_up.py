@@ -47,6 +47,11 @@ def create_sign_up_router() -> APIRouter:
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
             RoleAssignmentNotPermittedError: status.HTTP_422_UNPROCESSABLE_ENTITY,
             EmailAlreadyExistsError: status.HTTP_409_CONFLICT,
+            Exception: rule(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                translator=ServiceUnavailableTranslator(),
+                on_error=log_error,
+            ),
         },
         default_on_error=log_info,
         status_code=status.HTTP_201_CREATED,
