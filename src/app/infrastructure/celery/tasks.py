@@ -1,4 +1,5 @@
 import asyncio
+from dishka import Scope
 from celery.schedules import crontab
 
 from app.infrastructure.celery.app import celery_app
@@ -27,8 +28,9 @@ async def _run_task(coro_factory):
         settings=settings,
     )
     try:
-        # Dishka AsyncContainer is not an async context manager; manually manage lifecycle
-        await coro_factory(container)
+        # Enter REQUEST scope so REQUEST-scoped providers (e.g., repositories, sessions) are available
+        async with container.enter_scope(Scope.REQUEST):
+            await coro_factory(container)
     finally:
         await container.close()
 
