@@ -57,11 +57,18 @@ class ForgotPasswordHandler:
         await self._tx.commit()
 
         try:
+            subject = "Password reset request"
+            body = (
+                "Use the code below to reset your password\n"
+                f"{token}\n\n"
+                "If you did not request this, you can ignore this email."
+            )
             celery_app.send_task(
-                "tasks.email_tasks.send_password_reset_email",
+                "tasks.email_tasks.send_email",
                 kwargs={
                     "to_email": user.email.value,
-                    "reset_token": token,
+                    "subject": subject,
+                    "body": body,
                 },
             )
         except Exception as e:  # noqa: BLE001

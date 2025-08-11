@@ -93,6 +93,20 @@ def send_verification_email(**kwargs: Any) -> None:
         _send_email_via_mailgun(to_email, subject, body)
 
 
+@celery_app.task(name="tasks.email_tasks.send_password_reset_email")
+def send_password_reset_email(**kwargs: Any) -> None:
+    to_email = _safe_get(kwargs, "to_email")
+    reset_token = _safe_get(kwargs, "reset_token")
+    subject = "Password reset request"
+    body = (
+        "Use the code below to reset your password\n"
+        f"{reset_token}\n\n"
+        "If you did not request this, you can ignore this email."
+    )
+    if to_email and reset_token:
+        _send_email_via_mailgun(to_email, subject, body)
+
+
 @celery_app.task(name="invalidate_all_sessions")
 def invalidate_all_sessions_task(**_: Any) -> None:
     # Backward-compatibility stub; no args provided in messages seen.
