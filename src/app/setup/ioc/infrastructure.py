@@ -28,6 +28,7 @@ from app.infrastructure.auth.handlers.log_out import LogOutHandler
 from app.infrastructure.auth.handlers.sign_up import SignUpHandler
 from app.infrastructure.auth.handlers.refresh_token import RefreshTokenHandler
 from app.infrastructure.auth.handlers.verify_email import VerifyEmailHandler
+from app.infrastructure.auth.handlers.send_email_verification import SendEmailVerificationHandler
 from app.infrastructure.auth.handlers.account_me import GetMeHandler, UpdateMeHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
@@ -138,6 +139,7 @@ class InfrastructureProvider(Provider):
         LogOutHandler,
         RefreshTokenHandler,
         VerifyEmailHandler,
+        SendEmailVerificationHandler,
         GetMeHandler,
         UpdateMeHandler,
     )
