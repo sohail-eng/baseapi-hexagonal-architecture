@@ -14,6 +14,7 @@ from app.application.common.services.current_user import CurrentUserService
 from app.domain.value_objects.first_name import FirstName
 from app.domain.value_objects.last_name import LastName
 from app.domain.value_objects.phone_number import PhoneNumber
+from app.domain.value_objects.profile_picture import ProfilePicture
 from app.domain.value_objects.language import Language
 from app.domain.value_objects.address import Address
 from app.domain.value_objects.postal_code import PostalCode
@@ -113,6 +114,7 @@ class UpdateMeRequest:
     first_name: str | None = None
     last_name: str | None = None
     phone_number: str | None = None
+    profile_picture: str | None = None
     language: str | None = None
     address: str | None = None
     postal_code: str | None = None
@@ -149,6 +151,8 @@ class UpdateMeHandler:
             user.last_name = LastName(request.last_name)
         if request.phone_number is not None:
             user.phone_number = PhoneNumber(request.phone_number)
+        if request.profile_picture is not None:
+            user.profile_picture = ProfilePicture(request.profile_picture)
         if request.language is not None:
             user.language = Language(request.language)
         if request.address is not None:
