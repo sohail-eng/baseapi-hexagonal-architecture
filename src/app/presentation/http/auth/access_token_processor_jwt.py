@@ -50,12 +50,15 @@ class JwtAccessTokenProcessor:
             return None
 
         auth_session_id: str | None = payload.get(ACCESS_TOKEN_PAYLOAD_OF_INTEREST)
+        # Fallback: accept baseapi-style tokens where session id may be in 'sub'
         if auth_session_id is None:
-            log.debug(
-                "%s '%s'",
-                ACCESS_TOKEN_PAYLOAD_MISSING,
-                ACCESS_TOKEN_PAYLOAD_OF_INTEREST,
-            )
-            return None
+            auth_session_id = payload.get("sub")
+            if auth_session_id is None:
+                log.debug(
+                    "%s '%s'",
+                    ACCESS_TOKEN_PAYLOAD_MISSING,
+                    ACCESS_TOKEN_PAYLOAD_OF_INTEREST,
+                )
+                return None
 
         return auth_session_id

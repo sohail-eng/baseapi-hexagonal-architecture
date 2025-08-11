@@ -13,6 +13,7 @@ from app.presentation.http.controllers.account.refresh_token import (
 from app.presentation.http.controllers.account.email_verification import (
     create_email_verification_router,
 )
+from app.presentation.http.controllers.account.me import create_me_router
 
 
 def create_account_router() -> APIRouter:
@@ -27,6 +28,7 @@ def create_account_router() -> APIRouter:
         create_log_out_router(),
         create_refresh_token_router(),
         create_email_verification_router(),
+        create_me_router(),
     )
 
     for sub_router in sub_routers:

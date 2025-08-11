@@ -40,7 +40,7 @@ def map_users_table() -> None:
         updated_at = mapped_column(DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP'))
         last_login = mapped_column(DateTime, nullable=True)
         
-        # Profile information
+        # Profile information 
         profile_picture = mapped_column(String(255), nullable=True)
         phone_number = mapped_column(String(20), nullable=True)
         language = mapped_column(String(10), default="en")
