@@ -31,6 +31,7 @@ from app.infrastructure.auth.handlers.verify_email import VerifyEmailHandler
 from app.infrastructure.auth.handlers.send_email_verification import SendEmailVerificationHandler
 from app.infrastructure.auth.handlers.password_reset import ForgotPasswordHandler, ResetPasswordHandler
 from app.infrastructure.auth.handlers.change_password import ChangeOwnPasswordHandler
+from app.infrastructure.subscription.handlers.init_subscriptions import InitSubscriptionsHandler
 from app.infrastructure.auth.handlers.account_me import GetMeHandler, UpdateMeHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
@@ -77,6 +78,10 @@ from app.infrastructure.adapters.email_verification_repository_sqla import (
 )
 from app.infrastructure.adapters.password_reset_repository_sqla import (
     SqlaPasswordResetRepository as SqlaCommonPasswordResetRepository,
+)
+from app.application.subscription.ports import SubscriptionRepository
+from app.infrastructure.adapters.subscription_repository_sqla import (
+    SqlaSubscriptionRepository,
 )
 
 
@@ -140,6 +145,10 @@ class InfrastructureProvider(Provider):
         source=SqlaCommonPasswordResetRepository,
         provides=CommonPasswordResetRepository,
     )
+    subscription_repo = provide(
+        source=SqlaSubscriptionRepository,
+        provides=SubscriptionRepository,
+    )
     email_verification_repo = provide(
         source=SqlaEmailVerificationRepository,
         provides=EmailVerificationRepository,
@@ -156,6 +165,7 @@ class InfrastructureProvider(Provider):
         ForgotPasswordHandler,
         ResetPasswordHandler,
         ChangeOwnPasswordHandler,
+        InitSubscriptionsHandler,
         GetMeHandler,
         UpdateMeHandler,
     )
