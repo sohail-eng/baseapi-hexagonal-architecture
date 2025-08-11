@@ -21,4 +21,6 @@ fields = [
     # Mailgun from secrets
     "mailgun.DOMAIN",
     "mailgun.API_KEY",
+    # Stripe from secrets
+    "stripe.STRIPE_API_KEY"
 ]

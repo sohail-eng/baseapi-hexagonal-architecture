@@ -20,6 +20,7 @@ def create_subscription_init_router() -> APIRouter:
         description="Initialize default subscriptions (PRO and CORPORATE).",
         dependencies=[Security(bearer_scheme)],
         error_map={
+            Exception: status.HTTP_500_INTERNAL_SERVER_ERROR,
             DataMapperError: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),

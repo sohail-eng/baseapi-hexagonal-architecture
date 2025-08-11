@@ -10,15 +10,18 @@ from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 
 def map_subscriptions_table() -> None:
-    """Map Subscription entity to database table."""
-    
+    """Map Subscription entity to database table (idempotent)."""
+    if "subscriptions" in mapping_registry.metadata.tables:
+        return
+
     @mapping_registry.mapped
     class SubscriptionsTable:
         __tablename__ = "subscriptions"
-        
+        __table_args__ = {"extend_existing": True}
+
         # Primary key
         id = mapped_column(Integer, primary_key=True, index=True)
-        
+
         # Subscription information
         name = mapped_column(String(100), nullable=False)
         price = mapped_column(Float, nullable=False)
@@ -29,9 +32,9 @@ def map_subscriptions_table() -> None:
         is_active = mapped_column(Boolean, default=True)
         stripe_price_id = mapped_column(String(255), nullable=True)
         stripe_product_id = mapped_column(String(255), nullable=True)
-        
+
         # Timestamps
         created_at = mapped_column(DateTime, default=datetime.utcnow)
         updated_at = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Keep only table metadata for create_all
