@@ -76,6 +76,28 @@ class SqlaUserDataMapper(UserCommandGateway):
         except SQLAlchemyError as error:
             raise DataMapperError(DB_QUERY_FAILED) from error
 
+    async def update(self, user: User) -> None:
+        try:
+            map_users_table()
+            UsersTable = mapping_registry.metadata.tables["users"]  # type: ignore
+            update_values = {
+                "first_name": user.first_name.value,
+                "last_name": user.last_name.value,
+                "profile_picture": user.profile_picture.value if user.profile_picture else None,
+                "phone_number": user.phone_number.value if user.phone_number else None,
+                "language": user.language.value,
+                "address": user.address.value if user.address else None,
+                "postal_code": user.postal_code.value if user.postal_code else None,
+                "country_id": user.country_id.value if user.country_id else None,
+                "city_id": user.city_id.value if user.city_id else None,
+                "updated_at": user.updated_at.value,
+            }
+            await self._session.execute(
+                UsersTable.update().where(UsersTable.c.id == user.id_.value).values(**update_values)
+            )
+        except SQLAlchemyError as error:
+            raise DataMapperError(DB_QUERY_FAILED) from error
+
     async def read_by_id(self, user_id: UserId) -> User | None:
         """
         :raises DataMapperError:

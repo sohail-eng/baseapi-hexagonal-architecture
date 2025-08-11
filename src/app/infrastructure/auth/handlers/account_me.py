@@ -181,8 +181,7 @@ class UpdateMeHandler:
         user.updated_at = UpdatedAt(datetime.utcnow())
 
         # Persist
-        self._user_command_gateway.add(user)  # in-place update tracked by session
-        await self._flusher.flush()
+        await self._user_command_gateway.update(user)
         await self._tx.commit()
 
         # Return enriched response
