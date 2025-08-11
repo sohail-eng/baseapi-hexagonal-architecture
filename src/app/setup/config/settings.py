@@ -5,6 +5,7 @@ from app.setup.config.loader import ValidEnvs, get_current_env, load_full_config
 from app.setup.config.logs import LoggingSettings
 from app.setup.config.security import SecuritySettings
 from app.setup.config.mailgun import MailgunSettings
+from app.setup.config.stripe import StripeSettings
 
 
 class AppSettings(BaseModel):
@@ -13,6 +14,7 @@ class AppSettings(BaseModel):
     security: SecuritySettings
     logs: LoggingSettings
     mailgun: MailgunSettings | None = None
+    stripe: StripeSettings | None = None
 
 
 def load_settings(env: ValidEnvs | None = None) -> AppSettings:

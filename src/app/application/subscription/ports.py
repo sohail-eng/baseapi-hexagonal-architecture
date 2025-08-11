@@ -24,4 +24,7 @@ class SubscriptionRepository(Protocol):
         updated_at: datetime,
     ) -> int: ...
 
+    @abstractmethod
+    async def update_stripe_ids(self, *, id_: int, stripe_price_id: str, stripe_product_id: str) -> None: ...
+
 

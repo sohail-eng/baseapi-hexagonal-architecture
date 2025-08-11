@@ -21,3 +21,7 @@ MAX_OVERFLOW = 10
 [logs]
 # Level can be set to "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
 LEVEL = "DEBUG"
+
+# Stripe (non-secret defaults)
+[stripe]
+STRIPE_API_KEY = ""

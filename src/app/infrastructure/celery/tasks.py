@@ -1,6 +1,5 @@
 import asyncio
 from dishka import Scope
-from dishka.async_container import enter_scope
 from celery.schedules import crontab
 
 from app.infrastructure.celery.app import celery_app
@@ -30,8 +29,8 @@ async def _run_task(coro_factory):
     )
     try:
         # Enter REQUEST scope so REQUEST-scoped providers (e.g., repositories, sessions) are available
-        async with enter_scope(container, Scope.REQUEST):
-            await coro_factory(container)
+        async with container(scope=Scope.REQUEST) as request_container:
+            await coro_factory(request_container)
     finally:
         await container.close()
 
