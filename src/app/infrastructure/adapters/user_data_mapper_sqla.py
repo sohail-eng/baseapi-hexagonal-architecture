@@ -83,6 +83,7 @@ class SqlaUserDataMapper(UserCommandGateway):
             update_values = {
                 "first_name": user.first_name.value,
                 "last_name": user.last_name.value,
+                "is_verified": user.is_verified.value,
                 "profile_picture": user.profile_picture.value if user.profile_picture else None,
                 "phone_number": user.phone_number.value if user.phone_number else None,
                 "language": user.language.value,

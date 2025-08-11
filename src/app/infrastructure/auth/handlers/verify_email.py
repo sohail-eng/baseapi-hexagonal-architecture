@@ -39,6 +39,7 @@ class VerifyEmailHandler:
         # Mark user verified
         user.is_verified = UserVerified(True)
         user.updated_at = UpdatedAt(datetime.utcnow())
+        await self._user_command_gateway.update(user)
 
         # Mark token used and delete
         await self._repo.mark_used(id_=row["id"])  # type: ignore[index]
