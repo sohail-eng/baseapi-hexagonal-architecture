@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.presentation.http.controllers.account.router import create_account_router
 from app.presentation.http.controllers.general.router import create_general_router
-from app.presentation.http.controllers.users.router import create_users_router
+from app.presentation.http.controllers.admin.user.router import create_users_router
 from app.presentation.http.controllers.atlas.router import create_atlas_router
 
 
