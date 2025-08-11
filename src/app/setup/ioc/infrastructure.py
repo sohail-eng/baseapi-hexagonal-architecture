@@ -29,6 +29,7 @@ from app.infrastructure.auth.handlers.sign_up import SignUpHandler
 from app.infrastructure.auth.handlers.refresh_token import RefreshTokenHandler
 from app.infrastructure.auth.handlers.verify_email import VerifyEmailHandler
 from app.infrastructure.auth.handlers.send_email_verification import SendEmailVerificationHandler
+from app.infrastructure.auth.handlers.password_reset import ForgotPasswordHandler, ResetPasswordHandler
 from app.infrastructure.auth.handlers.account_me import GetMeHandler, UpdateMeHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
@@ -66,9 +67,15 @@ from app.application.maintenance.ports import (
     AuthSessionRepository,
     PasswordResetRepository,
 )
+from app.application.common.ports.password_reset_repository import (
+    PasswordResetRepository as CommonPasswordResetRepository,
+)
 from app.application.common.ports.email_verification_repository import EmailVerificationRepository
 from app.infrastructure.adapters.email_verification_repository_sqla import (
     SqlaEmailVerificationRepository,
+)
+from app.infrastructure.adapters.password_reset_repository_sqla import (
+    SqlaPasswordResetRepository as SqlaCommonPasswordResetRepository,
 )
 
 
@@ -127,6 +134,11 @@ class InfrastructureProvider(Provider):
         source=SqlaPasswordResetRepository,
         provides=PasswordResetRepository,
     )
+    # Common Password Reset Port (create/read/mark used)
+    common_password_reset_repo = provide(
+        source=SqlaCommonPasswordResetRepository,
+        provides=CommonPasswordResetRepository,
+    )
     email_verification_repo = provide(
         source=SqlaEmailVerificationRepository,
         provides=EmailVerificationRepository,
@@ -140,6 +152,8 @@ class InfrastructureProvider(Provider):
         RefreshTokenHandler,
         VerifyEmailHandler,
         SendEmailVerificationHandler,
+        ForgotPasswordHandler,
+        ResetPasswordHandler,
         GetMeHandler,
         UpdateMeHandler,
     )
