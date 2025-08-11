@@ -44,6 +44,7 @@ def create_password_reset_router() -> APIRouter:
         "/reset-password",
         description="Reset password using a valid token.",
         error_map={
+            AttributeError: status.HTTP_400_BAD_REQUEST,
             DataMapperError: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),

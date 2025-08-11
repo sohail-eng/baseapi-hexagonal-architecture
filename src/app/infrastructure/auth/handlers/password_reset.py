@@ -12,6 +12,7 @@ from app.domain.value_objects.user_password_hash import UserPasswordHash
 from app.domain.services.user import UserService
 from app.domain.ports.password_hasher import PasswordHasher
 from app.domain.value_objects.email import Email
+from app.domain.value_objects.user_id import UserId
 from app.application.common.ports.user_command_gateway import UserCommandGateway
 from app.domain.exceptions.user import UserNotFoundByEmailError
 
@@ -94,7 +95,7 @@ class ResetPasswordHandler:
             # Silently ignore to avoid token probing; could raise specific error
             return
 
-        user = await self._user_gateway.read_by_id(row["user_id"])  # type: ignore[index]
+        user = await self._user_gateway.read_by_id(UserId(int(row["user_id"])))  # type: ignore[index]
         if user is None:
             return
 
