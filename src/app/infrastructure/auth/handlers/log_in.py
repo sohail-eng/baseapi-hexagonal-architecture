@@ -102,6 +102,8 @@ class LogInHandler:
             raise AuthenticationError(AUTH_ACCOUNT_BLOCKED)
 
         self._user_service.record_successful_login(user)
+        # Persist last_login/updated_at to DB
+        await self._user_command_gateway.update(user)
         await self._transaction_manager.commit()
 
         auth_session, access_token = await self._auth_session_service.create_session(user.id_)

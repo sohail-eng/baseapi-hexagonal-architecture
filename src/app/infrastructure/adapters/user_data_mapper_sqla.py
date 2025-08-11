@@ -90,6 +90,7 @@ class SqlaUserDataMapper(UserCommandGateway):
                 "postal_code": user.postal_code.value if user.postal_code else None,
                 "country_id": user.country_id.value if user.country_id else None,
                 "city_id": user.city_id.value if user.city_id else None,
+                "last_login": user.last_login.value if user.last_login else None,
                 "updated_at": user.updated_at.value,
             }
             await self._session.execute(
