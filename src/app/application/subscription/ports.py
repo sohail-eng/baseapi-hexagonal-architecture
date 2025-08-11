@@ -8,6 +8,9 @@ class SubscriptionRepository(Protocol):
     async def read_by_name(self, name: str) -> dict | None: ...
 
     @abstractmethod
+    async def read_all(self) -> list[dict]: ...
+
+    @abstractmethod
     async def add(
         self,
         *,

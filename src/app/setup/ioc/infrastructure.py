@@ -32,6 +32,7 @@ from app.infrastructure.auth.handlers.send_email_verification import SendEmailVe
 from app.infrastructure.auth.handlers.password_reset import ForgotPasswordHandler, ResetPasswordHandler
 from app.infrastructure.auth.handlers.change_password import ChangeOwnPasswordHandler
 from app.infrastructure.subscription.handlers.init_subscriptions import InitSubscriptionsHandler
+from app.infrastructure.subscription.handlers.get_subscriptions import GetSubscriptionsHandler
 from app.infrastructure.auth.handlers.account_me import GetMeHandler, UpdateMeHandler
 from app.infrastructure.auth.session.id_generator_str import (
     StrAuthSessionIdGenerator,
@@ -166,6 +167,7 @@ class InfrastructureProvider(Provider):
         ResetPasswordHandler,
         ChangeOwnPasswordHandler,
         InitSubscriptionsHandler,
+        GetSubscriptionsHandler,
         GetMeHandler,
         UpdateMeHandler,
     )
