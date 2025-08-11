@@ -25,8 +25,13 @@ class Entity[T: ValueObject](ABC):
         Prevents modifying the `id` after it's set.
         Other attributes can be changed as usual.
         """
-        if name == "id_" and getattr(self, "id_", None) is not None:
-            raise DomainError("Changing entity ID is not permitted.")
+        if name == "id_":
+            current = getattr(self, "id_", None)
+            # Allow setting if id_ is not set yet, or if placeholder (value==0)
+            if current is not None:
+                current_value = getattr(current, "value", None)
+                if current_value not in (None, 0):
+                    raise DomainError("Changing entity ID is not permitted.")
         super().__setattr__(name, value)
 
     def __eq__(self, other: Any) -> bool:

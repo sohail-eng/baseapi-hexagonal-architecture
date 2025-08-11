@@ -8,7 +8,7 @@ from app.domain.value_objects.email import Email
 
 class UserCommandGateway(Protocol):
     @abstractmethod
-    def add(self, user: User) -> None:
+    async def add(self, user: User) -> None:
         """
         :raises DataMapperError:
         """

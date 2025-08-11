@@ -34,6 +34,12 @@ from app.infrastructure.auth.adapters.access_revoker import (
 from app.infrastructure.auth.adapters.identity_provider import (
     AuthSessionIdentityProvider,
 )
+from app.domain.services.user import UserService
+from app.domain.ports.password_hasher import PasswordHasher
+from app.domain.ports.user_id_generator import UserIdGenerator
+from app.infrastructure.adapters.password_hasher_bcrypt import BcryptPasswordHasher, PasswordPepper
+from app.infrastructure.adapters.user_id_generator_uuid import UuidUserIdGenerator
+from app.setup.config.security import PasswordSettings
 
 
 class ApplicationProvider(Provider):
@@ -42,7 +48,17 @@ class ApplicationProvider(Provider):
     # Services
     services = provide_all(
         CurrentUserService,
+        UserService,
     )
+
+    # Domain service dependencies
+    user_id_generator = provide(source=UuidUserIdGenerator, provides=UserIdGenerator)
+    password_hasher = provide(source=BcryptPasswordHasher, provides=PasswordHasher)
+
+    def _password_pepper(settings: PasswordSettings) -> PasswordPepper:  # factory
+        return PasswordPepper(settings.pepper)
+
+    pepper = provide(source=_password_pepper)
 
     # Ports Auth
     access_revoker = provide(

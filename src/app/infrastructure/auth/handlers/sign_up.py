@@ -135,7 +135,7 @@ class SignUpHandler:
             city_id=CityId(city_id) if city_id is not None else None,
         )
 
-        self._user_command_gateway.add(user)
+        await self._user_command_gateway.add(user)
 
         try:
             await self._flusher.flush()
