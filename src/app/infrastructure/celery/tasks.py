@@ -27,9 +27,8 @@ async def _run_task(coro_factory):
         settings=settings,
     )
     try:
-        async with container:
-            # Resolve and run
-            await coro_factory(container)
+        # Dishka AsyncContainer is not an async context manager; manually manage lifecycle
+        await coro_factory(container)
     finally:
         await container.close()
 
