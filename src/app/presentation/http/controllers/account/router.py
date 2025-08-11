@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.presentation.http.controllers.account.email_verification import create_email_verification_router
 from app.presentation.http.controllers.account.password_reset import create_password_reset_router
+from app.presentation.http.controllers.account.change_password import create_change_own_password_router
 from fastapi import APIRouter
 
 from app.presentation.http.controllers.account.log_in import create_log_in_router
@@ -34,6 +35,7 @@ def create_account_router() -> APIRouter:
         create_email_verification_router(),
         create_me_router(),
         create_password_reset_router(),
+        create_change_own_password_router(),
     )
 
     for sub_router in sub_routers:
