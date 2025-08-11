@@ -11,11 +11,15 @@ from app.infrastructure.persistence_sqla.registry import mapping_registry
 
 
 def map_users_table() -> None:
-    """Map User entity to database table."""
-    
+    """Map User entity to database table (idempotent)."""
+    # Idempotency guard: don't remap if already present
+    if "users" in mapping_registry.metadata.tables:
+        return
+
     @mapping_registry.mapped
     class UsersTable:
         __tablename__ = "users"
+        __table_args__ = {"extend_existing": True}
         
         # Primary key
         id = mapped_column(Integer, primary_key=True, index=True)

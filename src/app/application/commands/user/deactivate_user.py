@@ -95,7 +95,7 @@ class DeactivateUserInteractor:
 
         self._user_service.toggle_user_activation(user, is_active=False)
         await self._transaction_manager.commit()
-        await self._access_revoker.remove_all_user_access(user.id)
+        await self._access_revoker.remove_all_user_access(user.id_)
 
         log.info(
             "Deactivate user: done. Email: '%s'.",

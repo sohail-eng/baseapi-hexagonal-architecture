@@ -1,4 +1,4 @@
-from sqlalchemy import UUID, Column, DateTime, String, Table
+from sqlalchemy import Column, DateTime, String, Table, Integer, ForeignKey
 from sqlalchemy.orm import composite
 
 from app.domain.value_objects.user_id import UserId
@@ -9,7 +9,7 @@ auth_sessions_table = Table(
     "auth_sessions",
     mapping_registry.metadata,
     Column("id", String, primary_key=True),
-    Column("user_id", UUID(as_uuid=True), nullable=False),
+    Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
     Column("expiration", DateTime(timezone=True), nullable=False),
 )
 

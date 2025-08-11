@@ -1,15 +1,16 @@
 from sqlalchemy import Select, select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from app.application.common.ports.user_command_gateway import UserCommandGateway
 from app.domain.entities.user import User
 from app.domain.value_objects.user_id import UserId
 from app.domain.value_objects.email import Email
-from app.infrastructure.adapters.constants import DB_QUERY_FAILED
+from app.infrastructure.adapters.constants import DB_QUERY_FAILED, DB_CONSTRAINT_VIOLATION
 from app.infrastructure.adapters.types import MainAsyncSession
 from app.infrastructure.exceptions.gateway import DataMapperError
 from app.infrastructure.persistence_sqla.mappings.user import map_users_table
 from app.infrastructure.persistence_sqla.registry import mapping_registry
+from app.domain.exceptions.user import EmailAlreadyExistsError
 
 
 class SqlaUserDataMapper(UserCommandGateway):
@@ -51,6 +52,10 @@ class SqlaUserDataMapper(UserCommandGateway):
             if getattr(user.id_, "value", None) in (None, 0):
                 user.id_ = UserId(new_id)
 
+        except IntegrityError as error:
+            if "email" in str(error).lower():
+                raise EmailAlreadyExistsError(user.email.value) from error
+            raise DataMapperError(DB_CONSTRAINT_VIOLATION) from error
         except SQLAlchemyError as error:
             raise DataMapperError(DB_QUERY_FAILED) from error
 

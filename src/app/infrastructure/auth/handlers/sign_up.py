@@ -147,11 +147,9 @@ class SignUpHandler:
         await self._transaction_manager.commit()
 
         # Auto-login: create auth session and persist session row
-        auth_session, access_token = await self._auth_session_service.create_session(
-            user.id,
-        )
+        auth_session, access_token = await self._auth_session_service.create_session(user.id_)
         await self._session_recorder.add(
-            user_id=user.id.value,
+            user_id=user.id_.value,
             access_token=access_token,
             refresh_token=auth_session.refresh_token or "",
             token_type="bearer",
@@ -169,7 +167,7 @@ class SignUpHandler:
         from secrets import token_urlsafe
         token = token_urlsafe(32)
         expires_at = datetime.utcnow() + timedelta(hours=24)
-        await self._email_verification_repo.add(user_id=user.id.value, token=token, expires_at=expires_at)
+        await self._email_verification_repo.add(user_id=user.id_.value, token=token, expires_at=expires_at)
         try:
             celery_app.send_task(
                 "tasks.email_tasks.send_verification_email",
@@ -181,9 +179,9 @@ class SignUpHandler:
         except Exception as e:  # noqa: BLE001
             log.warning("Failed to enqueue verification email: %s", e)
         return SignUpResponse(
-            id=user.id.value,
+            id=user.id_.value,
             session_id=auth_session.id_,
-            user_id=user.id.value,
+            user_id=user.id_.value,
             expires_at=auth_session.expiration.isoformat(),
             access_token=access_token,
             refresh_token=auth_session.refresh_token or "",

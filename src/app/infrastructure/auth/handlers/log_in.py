@@ -104,10 +104,10 @@ class LogInHandler:
         self._user_service.record_successful_login(user)
         await self._transaction_manager.commit()
 
-        auth_session, access_token = await self._auth_session_service.create_session(user.id)
+        auth_session, access_token = await self._auth_session_service.create_session(user.id_)
         # Persist session row similar to baseapi
         await self._session_recorder.add(
-            user_id=user.id.value,
+            user_id=user.id_.value,
             access_token=access_token,
             refresh_token=auth_session.refresh_token or "",
             token_type="bearer",
@@ -122,13 +122,13 @@ class LogInHandler:
 
         log.info(
             "Log in: done. User, ID: '%s', email '%s', role '%s'.",
-            user.id.value,
+            user.id_.value,
             user.email.value,
             user.role.value,
         )
         return {
             "session_id": auth_session.id_,
-            "user_id": user.id.value,
+            "user_id": user.id_.value,
             "expires_at": auth_session.expiration.isoformat(),
             "refresh_token": auth_session.refresh_token,
             "token_type": "bearer",

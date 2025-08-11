@@ -11,7 +11,7 @@ from app.domain.exceptions.user import (
     RoleAssignmentNotPermittedError,
     EmailAlreadyExistsError,
 )
-from app.infrastructure.auth.exceptions import AlreadyAuthenticatedError
+from app.infrastructure.auth.exceptions import AlreadyAuthenticatedError, AuthenticationError
 from app.infrastructure.auth.handlers.sign_up import (
     SignUpHandler,
     SignUpRequest,
@@ -47,6 +47,11 @@ def create_sign_up_router() -> APIRouter:
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
             RoleAssignmentNotPermittedError: status.HTTP_422_UNPROCESSABLE_ENTITY,
             EmailAlreadyExistsError: status.HTTP_409_CONFLICT,
+            AuthenticationError: rule(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                translator=ServiceUnavailableTranslator(),
+                on_error=log_error,
+            ),
             Exception: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),
