@@ -10,6 +10,18 @@ from app.infrastructure.subscription.handlers.get_subscriptions import (
 from app.infrastructure.subscription.handlers.init_subscriptions import (
     InitSubscriptionsHandler,
 )
+from app.infrastructure.subscription.handlers.customer_subscription import (
+    CreateSubscriptionHandler,
+    CreateSubscriptionRequest,
+)
+from app.infrastructure.subscription.handlers.cancel_subscription import (
+    CancelSubscriptionHandler,
+    CancelSubscriptionRequest,
+)
+from app.infrastructure.subscription.handlers.success_subscription import (
+    SubscriptionSuccessHandler,
+    SubscriptionSuccessRequest,
+)
 from app.infrastructure.exceptions.gateway import DataMapperError
 from app.presentation.http.auth.fastapi_openapi_markers import bearer_scheme
 from app.presentation.http.errors.callbacks import log_error, log_info
@@ -59,6 +71,94 @@ def create_subscription_router() -> APIRouter:
         handler: FromDishka[InitSubscriptionsHandler],
     ) -> list[dict]:
         return await handler.execute(None)
+
+
+    @router.post(
+        "/{subscription_id}/subscribe",
+        description="Create a subscription for a customer",
+        dependencies=[Security(bearer_scheme)],
+        error_map={
+            DataMapperError: rule(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                translator=ServiceUnavailableTranslator(),
+                on_error=log_error,
+            ),
+            ValueError: status.HTTP_404_NOT_FOUND,
+        },
+        default_on_error=log_info,
+        status_code=status.HTTP_200_OK,
+    )
+    @inject
+    async def create_subscription(
+        subscription_id: int,
+        handler: FromDishka[CreateSubscriptionHandler],
+    ) -> dict:
+        return await handler.execute(CreateSubscriptionRequest(subscription_id=subscription_id))
+
+    @router.post(
+        "/{subscription_user_id}/cancel",
+        description="Cancel a subscription",
+        dependencies=[Security(bearer_scheme)],
+        error_map={
+            DataMapperError: rule(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                translator=ServiceUnavailableTranslator(),
+                on_error=log_error,
+            ),
+            ValueError: status.HTTP_404_NOT_FOUND,
+        },
+        default_on_error=log_info,
+        status_code=status.HTTP_200_OK,
+    )
+    @inject
+    async def cancel_subscription(
+        subscription_user_id: int,
+        handler: FromDishka[CancelSubscriptionHandler],
+    ) -> dict:
+        return await handler.execute(CancelSubscriptionRequest(subscription_user_id=subscription_user_id))
+
+    @router.get(
+        "/success",
+        description="Handle successful subscription payment",
+        error_map={
+            DataMapperError: rule(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                translator=ServiceUnavailableTranslator(),
+                on_error=log_error,
+            ),
+            ValueError: status.HTTP_404_NOT_FOUND,
+        },
+        default_on_error=log_info,
+        status_code=status.HTTP_200_OK,
+    )
+    @inject
+    async def subscription_success(
+        session_id: str,
+        handler: FromDishka[SubscriptionSuccessHandler],
+    ) -> dict:
+        return await handler.execute(SubscriptionSuccessRequest(session_id=session_id))
+
+    @router.get(
+        "/cancel",
+        description="Handle cancelled subscription payment",
+        error_map={
+            DataMapperError: rule(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                translator=ServiceUnavailableTranslator(),
+                on_error=log_error,
+            ),
+            ValueError: status.HTTP_404_NOT_FOUND,
+        },
+        default_on_error=log_info,
+        status_code=status.HTTP_200_OK,
+    )
+    @inject
+    async def subscription_cancel(
+        session_id: str,
+        handler: FromDishka[CancelSubscriptionHandler],
+    ) -> dict:
+        # reuse cancel handler to mark cancelled based on session id
+        return await handler.execute(CancelSubscriptionRequest(subscription_user_id=int(session_id)))
 
     return router
 

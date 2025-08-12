@@ -36,6 +36,15 @@ class SqlaSubscriptionRepository(SubscriptionRepository):
         except SQLAlchemyError as error:
             raise DataMapperError(DB_QUERY_FAILED) from error
 
+    async def read_by_id(self, id_: int) -> dict | None:
+        try:
+            table = mapping_registry.metadata.tables["subscriptions"]  # type: ignore
+            stmt: Select = select(table).where(table.c.id == id_)
+            row = (await self._session.execute(stmt)).mappings().first()
+            return dict(row) if row else None
+        except SQLAlchemyError as error:
+            raise DataMapperError(DB_QUERY_FAILED) from error
+
     async def add(
         self,
         *,
