@@ -144,10 +144,12 @@ class InfrastructureProvider(Provider):
     auth_session_repo = provide(
         source=SqlaAuthSessionRepository,
         provides=AuthSessionRepository,
+        scope=Scope.APP,
     )
     password_reset_repo = provide(
         source=SqlaPasswordResetRepository,
         provides=PasswordResetRepository,
+        scope=Scope.APP,
     )
     # Common Password Reset Port (create/read/mark used)
     common_password_reset_repo = provide(

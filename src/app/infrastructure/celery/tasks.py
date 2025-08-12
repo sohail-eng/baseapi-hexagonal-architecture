@@ -29,8 +29,8 @@ async def _run_task(coro_factory):
     )
     try:
         # Enter request scope so REQUEST-scoped providers can be resolved
-        async with container():
-            await coro_factory(container)
+        async with container() as request_container:  # type: ignore[misc]
+            await coro_factory(request_container)
     finally:
         await container.close()
 
@@ -38,7 +38,9 @@ async def _run_task(coro_factory):
 @celery_app.task(name="cleanup_expired_sessions")
 def cleanup_expired_sessions():
     async def runner(container):
-        repo = await container.get("app.application.maintenance.ports.AuthSessionRepository")  # type: ignore
+        from app.application.maintenance.ports import AuthSessionRepository
+
+        repo = await container.get(AuthSessionRepository)
         task = CleanupExpiredSessionsTask(repo)
         await task.run()
 
@@ -48,7 +50,9 @@ def cleanup_expired_sessions():
 @celery_app.task(name="cleanup_expired_password_resets")
 def cleanup_expired_password_resets():
     async def runner(container):
-        repo = await container.get("app.application.maintenance.ports.PasswordResetRepository")  # type: ignore
+        from app.application.maintenance.ports import PasswordResetRepository
+
+        repo = await container.get(PasswordResetRepository)
         task = CleanupExpiredPasswordResetsTask(repo)
         await task.run()
 
