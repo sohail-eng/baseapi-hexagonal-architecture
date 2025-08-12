@@ -221,10 +221,10 @@ def infrastructure_provider() -> InfrastructureProvider:
     )
     provider.provide(
         source=get_main_async_session,
-        scope=Scope.REQUEST,
+        scope=Scope.APP,
     )
     provider.provide(
         source=get_auth_async_session,
-        scope=Scope.REQUEST,
+        scope=Scope.APP,
     )
     return provider
