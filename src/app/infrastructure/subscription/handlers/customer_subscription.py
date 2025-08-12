@@ -14,6 +14,7 @@ from app.application.common.services.current_user import CurrentUserService
 @dataclass(frozen=True, slots=True)
 class CreateSubscriptionRequest:
     subscription_id: int
+    callback_base_url: str | None = None
 
 
 class CreateSubscriptionHandler:
@@ -66,13 +67,21 @@ class CreateSubscriptionHandler:
         checkout_session_id: str | None = None
         if api_key and plan.get("stripe_price_id"):
             stripe.api_key = api_key
-            session = stripe.checkout.Session.create(
-                mode="subscription",
-                line_items=[{"price": plan["stripe_price_id"], "quantity": 1}],
-                success_url="/api/v1/subscription/success?session_id={CHECKOUT_SESSION_ID}",
-                cancel_url="/api/v1/subscription/cancel?session_id={CHECKOUT_SESSION_ID}",
-            )
-            checkout_session_id = session["id"]
+            base = request.callback_base_url or "http://127.0.0.1:9999"
+            if base.endswith("/"):
+                base = base[:-1]
+            success_url = f"{base}/api/v1/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
+            cancel_url = f"{base}/api/v1/subscription/cancel?session_id={{CHECKOUT_SESSION_ID}}"
+            try:
+                session = stripe.checkout.Session.create(
+                    mode="subscription",
+                    line_items=[{"price": plan["stripe_price_id"], "quantity": 1}],
+                    success_url=success_url,
+                    cancel_url=cancel_url,
+                )
+                checkout_session_id = session["id"]
+            except Exception as e:  # noqa: BLE001
+                raise ValueError(str(e))
             # persist on subscription_user and payment
             await self._subs_user.update_data_json(
                 id_=subs_user_id,

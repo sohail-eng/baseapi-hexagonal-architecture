@@ -96,4 +96,21 @@ class SqlaSubscriptionUserRepository(SubscriptionUserRepository):
         except SQLAlchemyError as error:
             raise DataMapperError(DB_QUERY_FAILED) from error
 
+    async def read_active_for_user_and_subscription(
+        self, *, user_id: int, subscription_id: int
+    ) -> dict | None:
+        try:
+            table = mapping_registry.metadata.tables["subscription_users"]  # type: ignore
+            stmt: Select = select(table).where(
+                and_(
+                    table.c.user_id == user_id,
+                    table.c.subscription_id == subscription_id,
+                    table.c.status == "active",
+                )
+            )
+            row = (await self._session.execute(stmt)).mappings().first()
+            return dict(row) if row else None
+        except SQLAlchemyError as error:
+            raise DataMapperError(DB_QUERY_FAILED) from error
+
 

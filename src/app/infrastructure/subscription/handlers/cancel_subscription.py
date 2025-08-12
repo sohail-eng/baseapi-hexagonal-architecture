@@ -12,7 +12,7 @@ from app.application.common.services.current_user import CurrentUserService
 
 @dataclass(frozen=True, slots=True)
 class CancelSubscriptionRequest:
-    subscription_user_id: int
+    subscription_id: int
 
 
 class CancelSubscriptionHandler:
@@ -30,7 +30,9 @@ class CancelSubscriptionHandler:
 
     async def execute(self, request: CancelSubscriptionRequest) -> dict:
         user = await self._current_user_service.get_current_user()
-        subs_user = await self._subs_user.read_for_user_by_id(id_=request.subscription_user_id, user_id=user.id_.value)
+        subs_user = await self._subs_user.read_active_for_user_and_subscription(
+            user_id=user.id_.value, subscription_id=request.subscription_id
+        )
         if not subs_user:
             raise ValueError("Subscription not found")
 

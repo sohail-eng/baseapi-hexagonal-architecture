@@ -60,6 +60,11 @@ class SubscriptionUserRepository(Protocol):
     @abstractmethod
     async def update_data_json(self, *, id_: int, data_json: dict) -> None: ...
 
+    @abstractmethod
+    async def read_active_for_user_and_subscription(
+        self, *, user_id: int, subscription_id: int
+    ) -> dict | None: ...
+
 
 class PaymentRepository(Protocol):
     @abstractmethod

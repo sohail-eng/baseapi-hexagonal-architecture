@@ -78,6 +78,7 @@ def create_subscription_router() -> APIRouter:
         description="Create a subscription for a customer",
         dependencies=[Security(bearer_scheme)],
         error_map={
+            Exception: status.HTTP_400_BAD_REQUEST,
             DataMapperError: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),
@@ -92,11 +93,19 @@ def create_subscription_router() -> APIRouter:
     async def create_subscription(
         subscription_id: int,
         handler: FromDishka[CreateSubscriptionHandler],
+        request_host: str | None = None,
     ) -> dict:
-        return await handler.execute(CreateSubscriptionRequest(subscription_id=subscription_id))
+        # Build callback base url from request headers if available
+        # Fallback handled in handler
+        return await handler.execute(
+            CreateSubscriptionRequest(
+                subscription_id=subscription_id,
+                callback_base_url=request_host,
+            )
+        )
 
     @router.post(
-        "/{subscription_user_id}/cancel",
+        "/{subscription_id}/cancel",
         description="Cancel a subscription",
         dependencies=[Security(bearer_scheme)],
         error_map={
@@ -112,15 +121,16 @@ def create_subscription_router() -> APIRouter:
     )
     @inject
     async def cancel_subscription(
-        subscription_user_id: int,
+        subscription_id: int,
         handler: FromDishka[CancelSubscriptionHandler],
     ) -> dict:
-        return await handler.execute(CancelSubscriptionRequest(subscription_user_id=subscription_user_id))
+        return await handler.execute(CancelSubscriptionRequest(subscription_id=subscription_id))
 
     @router.get(
         "/success",
         description="Handle successful subscription payment",
         error_map={
+            Exception: status.HTTP_400_BAD_REQUEST,
             DataMapperError: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),
@@ -142,6 +152,7 @@ def create_subscription_router() -> APIRouter:
         "/cancel",
         description="Handle cancelled subscription payment",
         error_map={
+            Exception: status.HTTP_400_BAD_REQUEST,
             DataMapperError: rule(
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 translator=ServiceUnavailableTranslator(),
