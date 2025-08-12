@@ -28,8 +28,9 @@ async def _run_task(coro_factory):
         settings=settings,
     )
     try:
-        # Execute within container lifetime; providers with REQUEST scope will be created and cleaned on close
-        await coro_factory(container)
+        # Enter request scope so REQUEST-scoped providers can be resolved
+        async with container():
+            await coro_factory(container)
     finally:
         await container.close()
 
