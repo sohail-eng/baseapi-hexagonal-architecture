@@ -9,6 +9,7 @@ from app.application.subscription.ports import (
 )
 from app.application.common.ports.transaction_manager import TransactionManager
 from app.application.common.services.current_user import CurrentUserService
+from app.application.notification.ports import NotificationRepository
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,12 +25,14 @@ class CreateSubscriptionHandler:
         subscription_repo: SubscriptionRepository,
         subscription_user_repo: SubscriptionUserRepository,
         payment_repo: PaymentRepository,
+        notification_repo: NotificationRepository,
         transaction_manager: TransactionManager,
     ) -> None:
         self._current_user_service = current_user_service
         self._subs = subscription_repo
         self._subs_user = subscription_user_repo
         self._payments = payment_repo
+        self._notifications = notification_repo
         self._tx = transaction_manager
 
     async def execute(self, request: CreateSubscriptionRequest) -> dict:

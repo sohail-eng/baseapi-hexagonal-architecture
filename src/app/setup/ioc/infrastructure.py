@@ -92,6 +92,10 @@ from app.infrastructure.adapters.subscription_user_repository_sqla import (
 from app.infrastructure.adapters.payment_repository_sqla import (
     SqlaPaymentRepository,
 )
+from app.application.notification.ports import NotificationRepository
+from app.infrastructure.adapters.notification_repository_sqla import (
+    SqlaNotificationRepository,
+)
 
 
 class InfrastructureProvider(Provider):
@@ -167,6 +171,10 @@ class InfrastructureProvider(Provider):
     payment_repo = provide(
         source=SqlaPaymentRepository,
         provides=PaymentRepository,
+    )
+    notification_repo = provide(
+        source=SqlaNotificationRepository,
+        provides=NotificationRepository,
     )
     email_verification_repo = provide(
         source=SqlaEmailVerificationRepository,
