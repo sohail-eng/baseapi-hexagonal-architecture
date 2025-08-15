@@ -6,6 +6,7 @@ from app.presentation.http.controllers.admin.user.router import create_users_rou
 from app.presentation.http.controllers.atlas.router import create_atlas_router
 from app.presentation.http.controllers.subscription.router import create_subscription_router
 from app.presentation.http.controllers.notification.router import create_notification_router
+from app.presentation.http.controllers.payment.router import create_payment_router
 
 
 def create_api_v1_router() -> APIRouter:
@@ -20,6 +21,7 @@ def create_api_v1_router() -> APIRouter:
         create_atlas_router(),
         create_subscription_router(),
         create_notification_router(),
+        create_payment_router(),
     )
 
     for sub_router in sub_routers:

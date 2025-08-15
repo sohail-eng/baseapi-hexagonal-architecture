@@ -93,4 +93,17 @@ class PaymentRepository(Protocol):
     @abstractmethod
     async def update_data_json(self, *, id_: int, data_json: dict) -> None: ...
 
+    @abstractmethod
+    async def read_by_user_paginated(self, *, user_id: int, offset: int, limit: int) -> list[dict]: ...
+
+    @abstractmethod
+    async def find_or_create_transaction(
+        self,
+        *,
+        user_id: int,
+        amount: float,
+        currency: str,
+        description: str,
+    ) -> dict: ...
+
 

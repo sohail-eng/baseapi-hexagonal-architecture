@@ -91,4 +91,49 @@ class SqlaPaymentRepository(PaymentRepository):
         except SQLAlchemyError as error:
             raise DataMapperError(DB_QUERY_FAILED) from error
 
+    async def read_by_user_paginated(self, *, user_id: int, offset: int, limit: int) -> list[dict]:
+        try:
+            table = mapping_registry.metadata.tables["payments"]  # type: ignore
+            stmt: Select = (
+                select(table)
+                .where(table.c.user_id == user_id)
+                .order_by(table.c.created_at.desc())
+                .offset(offset)
+                .limit(limit)
+            )
+            rows = (await self._session.execute(stmt)).mappings().all()
+            return [dict(r) for r in rows]
+        except SQLAlchemyError as error:
+            raise DataMapperError(DB_QUERY_FAILED) from error
+
+    async def find_or_create_transaction(
+        self,
+        *,
+        user_id: int,
+        amount: float,
+        currency: str,
+        description: str,
+    ) -> dict:
+        try:
+            table = mapping_registry.metadata.tables["payments"]  # type: ignore
+            # naive approach: always create; in real case, would check idempotency key
+            result = await self._session.execute(
+                table.insert()
+                .values(
+                    user_id=user_id,
+                    amount=amount,
+                    currency=currency,
+                    status="pending",
+                    data_json={"description": description},
+                    created_at=datetime.utcnow(),
+                    updated_at=datetime.utcnow(),
+                )
+                .returning(table.c.id)
+            )
+            new_id = int(result.scalar_one())
+            row = (await self._session.execute(select(table).where(table.c.id == new_id))).mappings().first()
+            return dict(row) if row else {"id": new_id}
+        except SQLAlchemyError as error:
+            raise DataMapperError(DB_QUERY_FAILED) from error
+
 
